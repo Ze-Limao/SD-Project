@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-
+import sd23.*;
 public class Server {
     final static int WORKERS_PER_CONNECTION = 3;
 
@@ -33,6 +33,7 @@ public class Server {
                             accounts.get(acc.getName()).setActive(false);
                             lock.unlock();
                         }
+
                         else if (frame.tag == 1 && frame.src == 1){
                             System.out.println("Got login attempt");
 
@@ -53,11 +54,8 @@ public class Server {
                             }
                             lock.unlock();
                         }
-                        else {
-                            System.out.println("not implemented yet server-ln59 ");
-                        }
-                        /**else if (frame.tag == 2){
-                            System.out.println("new query\n");
+
+                        else if (frame.tag == 2 && frame.src == 1){
                             String str = (String)frame.obj;
                             try {
                                 // obter a tarefa de ficheiro, socket, etc...
@@ -67,11 +65,15 @@ public class Server {
 
                                 // utilizar o resultado ou reportar o erro
                                 System.err.println("success, returned "+output.length+" bytes");
-
+                                c.send(2,0,true,output);
                             } catch (JobFunctionException e) {
                                 System.err.println("job failed: code="+e.getCode()+" message="+e.getMessage());
+                                c.send(2,0,false,e.getCode(),e.getMessage());
                             }
-                        }*/
+                        }
+                        else {
+                            System.out.println("not implemented yet server-ln59 ");
+                        }
                     }
                 } catch (Exception ignored) { }
             };

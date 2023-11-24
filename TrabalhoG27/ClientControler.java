@@ -33,17 +33,15 @@ public class ClientControler {
         }
         return null;
     }
-    public boolean askQuery(Account acc) throws IOException {
+    public boolean askQuery() throws IOException {
 
         while (menu.clientMenu() != 0) {
-
             String quest = menu.askQuest();
-
 
             c.send(2,1,quest);
             Frame frame = c.receive();
-            if (frame.tag == 2){
-                System.out.println(frame.obj.toString());
+            if (frame.tag == 2 && frame.src == 0){
+                System.out.println((String)frame.obj);//o que querem daqui
             }
 
         }
@@ -53,36 +51,3 @@ public class ClientControler {
         c.send(0,1,acc);
     }
 }
-
-
-/**
- * public void login() {
- *
- *         int chosenMenu = menu.mainMenu();
- *         while (chosenMenu != 0) {
- *             switch (chosenMenu) {
- *                 case 1:
- *                     chosenMenu = menu.RegisterMenu(accs);
- *
- *                     break;
- *                 case 2:
- *                     chosenMenu = menu.LoginMenu(accs);
- *                     break;
- *                 case 3:
- *                     chosenMenu = menu.mainMenu();
- *                     break;
- *                 case 4:
- *                     chosenMenu = menu.clientMenu();
- *                     break;
- *                 case 5:
- *                     String quest = menu.askQuest();
- *                     //executequest(quest);
- *                     System.out.println("execute query not implemented yet");
- *                     chosenMenu = 4;
- *                     break;
- *                 default:
- *                     return;
- *             }
- *         }
- *     }
- *     */

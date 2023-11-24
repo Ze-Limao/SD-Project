@@ -2,6 +2,7 @@ package SD.TrabalhoG27;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -58,6 +59,35 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
+    public void send(int tag, int src, boolean bool, byte[] b) throws IOException {
+        this.writeLock.lock();
+        try{
+            this.out.writeInt(tag);
+            this.out.writeInt(src);
+            this.out.writeBoolean(bool);
+            this.out.writeInt(b.length);
+            this.out.write(b);
+            this.out.flush();
+        }
+        finally {
+            this.writeLock.unlock();
+        }
+    }
+    public void send(int tag, int src, boolean bool, int err, String msg) throws IOException {
+        this.writeLock.lock();
+        try{
+            this.out.writeInt(tag);
+            this.out.writeInt(src);
+            this.out.writeBoolean(bool);
+            this.out.writeInt(err);
+            this.out.writeUTF(msg);
+            this.out.flush();
+        }
+        finally {
+            this.writeLock.unlock();
+        }
+    }
+
     public Frame receive() throws IOException {
         this.readLock.lock();
         try{
@@ -76,8 +106,16 @@ public class TaggedConnection implements AutoCloseable {
                 return new Frame(tag,src, in.readBoolean());
             }
             else if (tag == 2 && src == 1){// send quest
-                System.out.println("tag 2 not implemented yet");
-                return null;
+                return new Frame(tag,src, in.readUTF());
+            }
+            else if (tag == 2 && src == 0) {// receive quest
+                System.out.println("recieved querya");
+                if (in.readBoolean()){
+                    byte[] b = new byte[in.readInt()];
+                    in.readFully(b);
+                    return new Frame(tag,src, Arrays.toString(b));
+                }
+                return new Frame(tag,src,("Error "+ in.readInt() + ": "+ in.readUTF()));
             }
             else {
                 System.out.println("not implemented yet //"+tag+"//"+src+"//");

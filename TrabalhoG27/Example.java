@@ -1,6 +1,6 @@
-package TrabalhoG27;
+/**package TrabalhoG27;
 
-/**
+
 import sd23.*;
 
 public class Example {
