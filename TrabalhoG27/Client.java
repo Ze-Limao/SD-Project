@@ -8,21 +8,21 @@ import java.net.Socket;
  * src = 0 <- server
  * src = 1 -> PC
  * tag1 -> enviar um nome e palavra passe
- *              tag + length+nome+legth+passe
+ *              tag + src + length+nome+legth+passe
  *         server deverá fazer lock desse client caso seja aceite
  *      <- receber luz verde para pedir cenas ou dizer que as credenciais são invalidas
- *              tag + boolean
+ *              tag + src + boolean
  * <p>
  * tag2 -> enviar uma tarefa para ser executada
- *              tag + codigo + memoria necessaria
+ *              tag + src + codigo + memoria necessaria
  *         server deverá atualizar a memoria disponivel e aumentar o valor das tarefas em espera, diminuir no final
  *      <- receber o resultado ou numero e mensagem de erro
- *              tag + boolean + resultado/(numero + length + mensagem)
+ *              tag + src + boolean + resultado/(numero + length + mensagem)
  * <p>
  * tag3 -> pedir o estado atual
- *              tag
+ *              tag + src
  *      <- devolver a memoria disponivel e o numero de tarefas pendentes
- *          tag + int + int
+ *          tag + src + int + int
  * */
 
 public class Client {

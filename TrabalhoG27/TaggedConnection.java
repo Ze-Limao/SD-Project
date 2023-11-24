@@ -32,6 +32,18 @@ public class TaggedConnection implements AutoCloseable {
             this.writeLock.unlock();
         }
     }
+    public void send(int tag, int src, Quest quest) throws IOException {
+        this.writeLock.lock();
+        try{
+            this.out.writeInt(tag);
+            this.out.writeInt(src);
+            quest.serialize(this.out);
+            this.out.flush();
+        }
+        finally {
+            this.writeLock.unlock();
+        }
+    }
 
     public void send(int tag, int src, boolean bool) throws IOException {
         this.writeLock.lock();
@@ -102,14 +114,13 @@ public class TaggedConnection implements AutoCloseable {
                 Account acc = Account.deserialize(in);
                 return new Frame(tag, src, acc);
             }
-            else if (tag == 1 && src == 0){ // responce to login
+            else if (tag == 1 && src == 0){ // response to login
                 return new Frame(tag,src, in.readBoolean());
             }
             else if (tag == 2 && src == 1){// send quest
-                return new Frame(tag,src, in.readUTF());
+                return new Frame(tag,src, Quest.deserialize(in));
             }
             else if (tag == 2 && src == 0) {// receive quest
-                System.out.println("recieved querya");
                 if (in.readBoolean()){
                     byte[] b = new byte[in.readInt()];
                     in.readFully(b);

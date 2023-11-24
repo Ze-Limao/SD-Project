@@ -4,8 +4,8 @@ package SD.TrabalhoG27;
 import java.io.IOException;
 
 public class ClientControler {
-    private Menu menu;
-    private TaggedConnection c;
+    private final Menu menu;
+    private final TaggedConnection c;
 
     public ClientControler(TaggedConnection c) {
         this.menu = new Menu();
@@ -36,13 +36,16 @@ public class ClientControler {
     public boolean askQuery() throws IOException {
 
         while (menu.clientMenu() != 0) {
-            String quest = menu.askQuest();
 
+            //askquest
+
+            Quest quest = new Quest (1000,menu.askQuest());
             c.send(2,1,quest);
             Frame frame = c.receive();
             if (frame.tag == 2 && frame.src == 0){
                 System.out.println((String)frame.obj);//o que querem daqui
             }
+            //askstats
 
         }
         return false;

@@ -10,7 +10,6 @@ public class Account {
 
     private final String name;
     private final String password;
-
     private boolean active;
 
     public Account(String name, String password){
