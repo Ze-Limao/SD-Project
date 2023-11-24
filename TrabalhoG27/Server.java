@@ -1,4 +1,4 @@
-package TrabalhoG27;
+package SD.TrabalhoG27;
 
 import java.net.ServerSocket;
 import java.net.Socket;

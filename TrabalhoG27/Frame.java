@@ -1,4 +1,4 @@
-package TrabalhoG27;
+package SD.TrabalhoG27;
 
 public class Frame {
     public final int tag;
