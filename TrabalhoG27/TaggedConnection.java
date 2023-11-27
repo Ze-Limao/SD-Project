@@ -120,41 +120,44 @@ public class TaggedConnection implements AutoCloseable {
             int tag = in.readInt();
             int src = in.readInt();
 
-            if (tag == 1 && src == 1){ //login
-                Account acc = Account.deserialize(in);
-                return new Frame(tag, src, acc);
-            }
-            else if (tag == 0 && src == 1){ //logout
-                Account acc = Account.deserialize(in);
-                return new Frame(tag, src, acc);
-            }
-            else if (tag == 1 && src == 0){ // response to login
-                return new Frame(tag,src, in.readBoolean());
-            }
-            else if (tag == 2 && src == 1){// send quest
-                return new Frame(tag,src, Quest.deserialize(in));
-            }
-            else if (tag == 2 && src == 0) {// receive quest
-                if (in.readBoolean()){
-                    byte[] b = new byte[in.readInt()];
-                    in.readFully(b);
-                    return new Frame(tag,src, Arrays.toString(b));
+            if (src == 1) {
+                switch (tag) {
+                    case 1, 0 -> {
+                        Account acc = Account.deserialize(in);
+                        return new Frame(tag, src, acc);
+                    }
+                    case 2 -> {
+                        return new Frame(tag, src, Quest.deserialize(in));
+                    }
+                    case 3 -> {
+                        in.readUTF();
+                        return new Frame(tag, src, null);
+                    }
+                    default -> System.out.println("not implemented tag on receive");
                 }
-                return new Frame(tag,src,("Error "+ in.readInt() + ": "+ in.readUTF()));
             }
-            else if (tag == 3 && src == 0){// read stats
-                return new Frame(tag,src,"There is " + in.readInt() + " bytes available and " + in.readInt() + " tasks waiting");
+            else if (src == 0) {
+                switch (tag) {
+                    case 1 -> {
+                        return new Frame(tag, src, in.readBoolean());
+                    }
+                    case 2 -> {
+                        if (in.readBoolean()) {
+                            byte[] b = new byte[in.readInt()];
+                            in.readFully(b);
+                            return new Frame(tag, src, Arrays.toString(b));
+                        }
+                        return new Frame(tag, src, ("Error " + in.readInt() + ": " + in.readUTF()));
+                    }
+                    case 3 -> {
+                        return new Frame(tag, src, "There is " + in.readInt() + " bytes available and " + in.readInt() + " tasks waiting");
+                    }
+                    default -> System.out.println("not implemented tag on receive");
+                }
             }
-            else if (tag == 3 && src == 1){// ask stats
-                in.readUTF();
-                return new Frame(tag,src,null);
-            }
-            else {
-                System.out.println("not implemented yet //"+tag+"//"+src+"//");
-                return null;
-            }
-        }
-        finally {
+            System.out.println("not implemented yet //" + tag + "//" + src + "//");
+            return null;
+        } finally {
             this.readLock.unlock();
         }
     }
