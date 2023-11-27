@@ -35,17 +35,27 @@ public class ClientControler {
     }
     public boolean askQuery() throws IOException {
 
-        while (menu.clientMenu() != 0) {
+        int i;
+        while ((i = menu.clientMenu()) != 0) {
 
             //askquest
-
-            Quest quest = new Quest (1000,menu.askQuest());
-            c.send(2,1,quest);
-            Frame frame = c.receive();
-            if (frame.tag == 2 && frame.src == 0){
-                System.out.println((String)frame.obj);//o que querem daqui
+            if (i == 1) {
+                Quest quest = new Quest(1000, menu.askQuest());
+                c.send(2, 1, quest);
+                Frame frame = c.receive();
+                if (frame.tag == 2 && frame.src == 0) {
+                    System.out.println((String) frame.obj);//o que querem daqui
+                }
             }
             //askstats
+            if (i == 2){
+                c.send(3, 1,"");
+                Frame frame = c.receive();
+                if (frame.tag == 3 && frame.src == 0) {
+                    System.out.println((String) frame.obj);
+                }
+            }
+
 
         }
         return false;

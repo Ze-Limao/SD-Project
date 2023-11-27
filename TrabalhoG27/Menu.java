@@ -69,14 +69,13 @@ public class Menu  {
         int option = -1;
         Scanner input = new Scanner(System.in);
 
-        while (option != 1 && option != 0) {
+        while (option != 1 && option != 0 && option != 2) {
             System.out.println( """
                     \t\tWelcome
                         
                     1 -> Make a Quest
-                    0 -> Logout
-                    
-                    """);
+                    2 -> Get Server statistics
+                    0 -> Logout""");
             option = input.nextInt();
         }
         return option;

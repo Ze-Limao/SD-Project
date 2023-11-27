@@ -2,15 +2,19 @@ package SD.TrabalhoG27;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import sd23.*;
+
+//O erro está no tag = 3... não está a limpar o buffer...
+
+
 public class Server {
     final static int WORKERS_PER_CONNECTION = 3;
 
     private static final Accounts accounts = new Accounts();
     private static final ReentrantLock lock = new ReentrantLock();
+
+    private static final Statistics stats = new Statistics(10000);
 
     public static void main(String[] args) throws Exception {
         ServerSocket ss = new ServerSocket(12345);
@@ -44,12 +48,13 @@ public class Server {
 
                         else if (frame.tag == 2){
                             Quest q = (Quest)frame.obj;
+                            stats.newTask(q.getMemory());
                             try {
                                 // obter a tarefa de ficheiro, socket, etc...
                                 byte[] job = q.getCode().getBytes();
                                 // executar a tarefa
                                 byte[] output = JobFunction.execute(job);
-
+                                stats.endTask(q.getMemory());
                                 // utilizar o resultado ou reportar o erro
                                 System.err.println("success, returned "+output.length+" bytes");
                                 c.send(2,0,true,output);
@@ -57,6 +62,9 @@ public class Server {
                                 System.err.println("job failed: code="+e.getCode()+" message="+e.getMessage());
                                 c.send(2,0,false,e.getCode(),e.getMessage());
                             }
+                        }
+                        else if (frame.tag == 3){
+                            c.send(3,0,stats.getAvailableMemory(), stats.getActiveTasks());
                         }
                         else {
                             System.out.println("not implemented yet server-ln59 ");

@@ -100,6 +100,20 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
+    public void send(int tag, int src, int activeTasks, int availableMemory)throws IOException {
+        this.writeLock.lock();
+        try{
+            this.out.writeInt(tag);
+            this.out.writeInt(src);
+            this.out.writeInt(activeTasks);
+            this.out.writeInt(availableMemory);
+            this.out.flush();
+        }
+        finally {
+            this.writeLock.unlock();
+        }
+    }
+
     public Frame receive() throws IOException {
         this.readLock.lock();
         try{
@@ -127,6 +141,13 @@ public class TaggedConnection implements AutoCloseable {
                     return new Frame(tag,src, Arrays.toString(b));
                 }
                 return new Frame(tag,src,("Error "+ in.readInt() + ": "+ in.readUTF()));
+            }
+            else if (tag == 3 && src == 0){// read stats
+                return new Frame(tag,src,"There is " + in.readInt() + " bytes available and " + in.readInt() + " tasks waiting");
+            }
+            else if (tag == 3 && src == 1){// ask stats
+                in.readUTF();
+                return new Frame(tag,src,null);
             }
             else {
                 System.out.println("not implemented yet //"+tag+"//"+src+"//");
