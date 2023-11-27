@@ -45,6 +45,7 @@ public class Statistics {
             this.lock.lock();
             activeTasks -= 1;
             this.availableMemory += memory;
+            cond.signalAll();
 
         }finally{
             this.lock.unlock();

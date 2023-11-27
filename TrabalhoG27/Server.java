@@ -5,8 +5,6 @@ import java.net.Socket;
 import java.util.concurrent.locks.ReentrantLock;
 import sd23.*;
 
-//O erro está no tag = 3... não está a limpar o buffer...
-
 
 public class Server {
     final static int WORKERS_PER_CONNECTION = 3;
