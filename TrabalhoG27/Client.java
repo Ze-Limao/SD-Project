@@ -38,7 +38,7 @@ public class Client {
             if (acc == null) {
                 return;
             }
-            while (cc.askQuery()) {}
+            cc.askQuery();
             cc.logout(acc);
         }
 

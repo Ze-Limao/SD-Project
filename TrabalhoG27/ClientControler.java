@@ -6,19 +6,22 @@ import java.io.IOException;
 public class ClientControler {
     private final Menu menu;
     private final TaggedConnection c;
+    int ask;
+
 
     public ClientControler(TaggedConnection c) {
         this.menu = new Menu();
         this.c = c;
+        ask = 0;
     }
 
     public Account login() throws IOException {
 
         Account acc;
+        ask+=1;
         while ((menu.mainMenu())!= 0) {
             acc = menu.RegisterMenu();
-
-            c.send(1,1,acc);
+            c.send(1,1,ask, acc);
             Frame frame = c.receive();
             if (frame.tag == 1 && frame.src == 0){
                 Boolean loginSucceeded = (Boolean)frame.obj;
@@ -33,34 +36,47 @@ public class ClientControler {
         }
         return null;
     }
-    public boolean askQuery() throws IOException {
+    public void askQuery() {
 
         int i;
         while ((i = menu.clientMenu()) != 0) {
-
+            ask += 1;
+            
             //askquest
             if (i == 1) {
                 Quest quest = new Quest(1000, menu.askQuest());
-                c.send(2, 1, quest);
-                Frame frame = c.receive();
-                if (frame.tag == 2 && frame.src == 0) {
-                    System.out.println((String) frame.obj);//o que querem daqui
-                }
+                Thread thread = new Thread (() -> {
+                    try {
+                        c.send(2, 1, ask, quest);
+                        Frame frame = c.receive();
+                        if (frame.tag == 2 && frame.src == 0) {
+                            System.out.println("quest number: "+ frame.ask +" content:" + frame.obj);//o que querem daqui
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                thread.start();
             }
             //askstats
             if (i == 2){
-                c.send(3, 1,"");
-                Frame frame = c.receive();
-                if (frame.tag == 3 && frame.src == 0) {
-                    System.out.println((String) frame.obj);
+                Thread thread = new Thread (() -> {
+                try {
+                    c.send(3, 1, ask, "");
+                    Frame frame = c.receive();
+                    if (frame.tag == 3 && frame.src == 0) {
+                        System.out.println("quest number: "+ frame.ask +" content:" + frame.obj);
+                    }
                 }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                });
+                thread.start();
             }
-
-
         }
-        return false;
     }
     public void logout(Account acc) throws IOException {
-        c.send(0,1,acc);
+        c.send(0,1,ask,acc);
     }
 }

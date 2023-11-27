@@ -35,7 +35,7 @@ public class ServerSwitcher {
                 System.out.println("Got login attempt");
 
                 lock.lock();
-                c.send(1,0, accounts.loginAttempt((Account)frame.obj));
+                c.send(1,0, frame.ask, accounts.loginAttempt((Account)frame.obj));
                 lock.unlock();
             }
 
@@ -49,10 +49,10 @@ public class ServerSwitcher {
 
                     // utilizar o resultado ou reportar o erro
                     System.err.println("success, returned "+output.length+" bytes");
-                    c.send(2,0,true,output);
+                    c.send(2,0,frame.ask, true,output);
                 } catch (JobFunctionException e) {
                     System.err.println("job failed: code="+e.getCode()+" message="+e.getMessage());
-                    c.send(2,0,false,e.getCode(),e.getMessage());
+                    c.send(2,0,frame.ask, false,e.getCode(),e.getMessage());
                 }
             }
             else {

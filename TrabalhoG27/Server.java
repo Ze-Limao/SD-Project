@@ -7,7 +7,7 @@ import sd23.*;
 
 
 public class Server {
-    final static int WORKERS_PER_CONNECTION = 3;
+    final static int WORKERS_PER_CONNECTION = 10;
 
     private static final Accounts accounts = new Accounts();
     private static final ReentrantLock lock = new ReentrantLock();
@@ -30,17 +30,17 @@ public class Server {
                             return;
                         }
                         if (frame.tag == 0){
-                            System.out.println("Got logout attempt");
+                            System.out.println("Got logout attempt"+frame.ask);
 
                             accounts.setActive(((Account)frame.obj).getName(), false);
 
                         }
 
                         else if (frame.tag == 1){
-                            System.out.println("Got login attempt");
+                            System.out.println("Got login attempt"+frame.ask);
 
                             lock.lock();
-                            c.send(1,0, accounts.loginAttempt((Account)frame.obj));
+                            c.send(1,0, frame.ask, accounts.loginAttempt((Account)frame.obj));
                             lock.unlock();
                         }
 
@@ -55,14 +55,14 @@ public class Server {
                                 stats.endTask(q.getMemory());
                                 // utilizar o resultado ou reportar o erro
                                 System.err.println("success, returned "+output.length+" bytes");
-                                c.send(2,0,true,output);
+                                c.send(2,0, frame.ask, true,output);
                             } catch (JobFunctionException e) {
-                                System.err.println("job failed: code="+e.getCode()+" message="+e.getMessage());
-                                c.send(2,0,false,e.getCode(),e.getMessage());
+                                System.err.println("job failed: code=" + e.getCode() + " message=" + e.getMessage());
+                                c.send(2,0,frame.ask, false,e.getCode(),e.getMessage());
                             }
                         }
                         else if (frame.tag == 3){
-                            c.send(3,0,stats.getAvailableMemory(), stats.getActiveTasks());
+                            c.send(3,0,frame.ask, stats.getAvailableMemory(), stats.getActiveTasks());
                         }
                         else {
                             System.out.println("not implemented yet server-ln59 ");

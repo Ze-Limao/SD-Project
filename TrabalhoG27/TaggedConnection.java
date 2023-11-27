@@ -20,11 +20,12 @@ public class TaggedConnection implements AutoCloseable {
         this.in = new DataInputStream(new BufferedInputStream(s.getInputStream()));
     }
 
-    public void send(int tag, int src, Account acc) throws IOException {
+    public void send(int tag, int src, int ask, Account acc) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
             this.out.writeInt(src);
+            this.out.writeInt(ask);
             acc.serialize(this.out);
             this.out.flush();
         }
@@ -32,11 +33,12 @@ public class TaggedConnection implements AutoCloseable {
             this.writeLock.unlock();
         }
     }
-    public void send(int tag, int src, Quest quest) throws IOException {
+    public void send(int tag, int src, int ask, Quest quest) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
             this.out.writeInt(src);
+            this.out.writeInt(ask);
             quest.serialize(this.out);
             this.out.flush();
         }
@@ -45,11 +47,12 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
-    public void send(int tag, int src, boolean bool) throws IOException {
+    public void send(int tag, int src, int ask, boolean bool) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
             this.out.writeInt(src);
+            this.out.writeInt(ask);
             this.out.writeBoolean(bool);
             this.out.flush();
         }
@@ -58,11 +61,12 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
-    public void send(int tag, int src, String str) throws IOException {
+    public void send(int tag, int src, int ask, String str) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
             this.out.writeInt(src);
+            this.out.writeInt(ask);
             this.out.writeUTF(str);
             this.out.flush();
         }
@@ -71,11 +75,12 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
-    public void send(int tag, int src, boolean bool, byte[] b) throws IOException {
+    public void send(int tag, int src, int ask, boolean bool, byte[] b) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
             this.out.writeInt(src);
+            this.out.writeInt(ask);
             this.out.writeBoolean(bool);
             this.out.writeInt(b.length);
             this.out.write(b);
@@ -85,11 +90,12 @@ public class TaggedConnection implements AutoCloseable {
             this.writeLock.unlock();
         }
     }
-    public void send(int tag, int src, boolean bool, int err, String msg) throws IOException {
+    public void send(int tag, int src, int ask, boolean bool, int err, String msg) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
             this.out.writeInt(src);
+            this.out.writeInt(ask);
             this.out.writeBoolean(bool);
             this.out.writeInt(err);
             this.out.writeUTF(msg);
@@ -100,11 +106,12 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
-    public void send(int tag, int src, int activeTasks, int availableMemory)throws IOException {
+    public void send(int tag, int src, int ask, int activeTasks, int availableMemory)throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
             this.out.writeInt(src);
+            this.out.writeInt(ask);
             this.out.writeInt(activeTasks);
             this.out.writeInt(availableMemory);
             this.out.flush();
@@ -119,19 +126,19 @@ public class TaggedConnection implements AutoCloseable {
         try{
             int tag = in.readInt();
             int src = in.readInt();
-
+            int ask = in.readInt();
             if (src == 1) {
                 switch (tag) {
                     case 1, 0 -> {
                         Account acc = Account.deserialize(in);
-                        return new Frame(tag, src, acc);
+                        return new Frame(tag, src,ask, acc);
                     }
                     case 2 -> {
-                        return new Frame(tag, src, Quest.deserialize(in));
+                        return new Frame(tag, src,ask, Quest.deserialize(in));
                     }
                     case 3 -> {
                         in.readUTF();
-                        return new Frame(tag, src, null);
+                        return new Frame(tag, src,ask, null);
                     }
                     default -> System.out.println("not implemented tag on receive");
                 }
@@ -139,18 +146,18 @@ public class TaggedConnection implements AutoCloseable {
             else if (src == 0) {
                 switch (tag) {
                     case 1 -> {
-                        return new Frame(tag, src, in.readBoolean());
+                        return new Frame(tag, src,ask, in.readBoolean());
                     }
                     case 2 -> {
                         if (in.readBoolean()) {
                             byte[] b = new byte[in.readInt()];
                             in.readFully(b);
-                            return new Frame(tag, src, Arrays.toString(b));
+                            return new Frame(tag, src,ask, Arrays.toString(b));
                         }
-                        return new Frame(tag, src, ("Error " + in.readInt() + ": " + in.readUTF()));
+                        return new Frame(tag, src,ask, ("Error " + in.readInt() + ": " + in.readUTF()));
                     }
                     case 3 -> {
-                        return new Frame(tag, src, "There is " + in.readInt() + " bytes available and " + in.readInt() + " tasks waiting");
+                        return new Frame(tag, src,ask, "There is " + in.readInt() + " bytes available and " + in.readInt() + " tasks waiting");
                     }
                     default -> System.out.println("not implemented tag on receive");
                 }
