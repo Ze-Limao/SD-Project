@@ -1,4 +1,4 @@
-package SD.TrabalhoG27;
+package TrabalhoG27;
 
 import java.util.Map;
 import java.util.Scanner;

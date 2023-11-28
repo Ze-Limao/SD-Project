@@ -1,4 +1,4 @@
-package SD.TrabalhoG27;
+package TrabalhoG27;
 
 
 import java.io.IOException;
@@ -41,7 +41,6 @@ public class ClientControler {
         int i;
         while ((i = menu.clientMenu()) != 0) {
             ask += 1;
-            
             //askquest
             if (i == 1) {
                 Quest quest = new Quest(1000, menu.askQuest());
@@ -77,6 +76,7 @@ public class ClientControler {
         }
     }
     public void logout(Account acc) throws IOException {
-        c.send(0,1,ask,acc);
+            if(acc != null)
+                c.send(0,1,ask,acc);
     }
 }

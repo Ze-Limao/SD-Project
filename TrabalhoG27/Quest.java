@@ -1,4 +1,4 @@
-package SD.TrabalhoG27;
+package TrabalhoG27;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

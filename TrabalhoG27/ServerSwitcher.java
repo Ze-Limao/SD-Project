@@ -1,4 +1,4 @@
-package SD.TrabalhoG27;
+package TrabalhoG27;
 
 import sd23.JobFunction;
 import sd23.JobFunctionException;

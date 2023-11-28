@@ -1,4 +1,4 @@
-package SD.TrabalhoG27;
+package TrabalhoG27;
 
 
 import java.io.IOException;
@@ -7,6 +7,8 @@ import java.net.Socket;
 /**
  * src = 0 <- server
  * src = 1 -> PC
+ * tag0 -> logout
+ *
  * tag1 -> enviar um nome e palavra passe
  *              tag + src + length+nome+legth+passe
  *         server deverá fazer lock desse client caso seja aceite
@@ -31,17 +33,20 @@ public class Client {
         Socket s = new Socket("localhost", 12345);
         TaggedConnection c = new TaggedConnection(s);
         ClientControler cc = new ClientControler(c);
-
-        //get client list
-        while(true) {
-            Account acc = cc.login();
-            if (acc == null) {
-                return;
+        Account acc = null;
+        try {
+            //get client list
+            while (true) {
+                acc = cc.login();
+                if (acc == null) {
+                    return;
+                }
+                cc.askQuery();
+                cc.logout(acc);
             }
-            cc.askQuery();
+        } finally {
             cc.logout(acc);
         }
-
         //send a mensage with tag
         //autenticate
         //execute queries using that cient

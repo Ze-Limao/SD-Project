@@ -1,4 +1,4 @@
-package SD.TrabalhoG27;
+package TrabalhoG27;
 
 import java.io.*;
 import java.net.Socket;
@@ -106,7 +106,7 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
-    public void send(int tag, int src, int ask, int activeTasks, int availableMemory)throws IOException {
+    public void send(int tag, int src, int ask, int activeTasks, int availableMemory) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
@@ -131,14 +131,14 @@ public class TaggedConnection implements AutoCloseable {
                 switch (tag) {
                     case 1, 0 -> {
                         Account acc = Account.deserialize(in);
-                        return new Frame(tag, src,ask, acc);
+                        return new Frame(tag, src, ask, acc);
                     }
                     case 2 -> {
-                        return new Frame(tag, src,ask, Quest.deserialize(in));
+                        return new Frame(tag, src, ask, Quest.deserialize(in));
                     }
                     case 3 -> {
                         in.readUTF();
-                        return new Frame(tag, src,ask, null);
+                        return new Frame(tag, src, ask, null);
                     }
                     default -> System.out.println("not implemented tag on receive");
                 }

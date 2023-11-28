@@ -1,4 +1,4 @@
-package SD.TrabalhoG27;
+package TrabalhoG27;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,18 +26,16 @@ public class Server {
                     for (;;) {
                         Frame frame = c.receive();
                         if (frame.src != 1){
-                            System.out.println("recieved something from src:" + frame.src);
+                            System.out.println("received something from src:" + frame.src);
                             return;
                         }
                         if (frame.tag == 0){
-                            System.out.println("Got logout attempt"+frame.ask);
-
+                            System.out.println("Got logout attempt");
                             accounts.setActive(((Account)frame.obj).getName(), false);
-
                         }
 
                         else if (frame.tag == 1){
-                            System.out.println("Got login attempt"+frame.ask);
+                            System.out.println("Got login attempt");
 
                             lock.lock();
                             c.send(1,0, frame.ask, accounts.loginAttempt((Account)frame.obj));
