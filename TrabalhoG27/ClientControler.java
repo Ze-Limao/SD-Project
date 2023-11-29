@@ -58,7 +58,7 @@ public class ClientControler {
                 thread.start();
             }
             //askstats
-            if (i == 2){
+            else if (i == 2){
                 Thread thread = new Thread (() -> {
                 try {
                     c.send(3, 1, ask, "");
