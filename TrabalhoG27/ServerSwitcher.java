@@ -18,6 +18,7 @@ public class ServerSwitcher {
     }
 
     public void execute() throws IOException {
+
         for (;;) {
             Frame frame = c.receiveFromPC();
             if (frame.src != 1){

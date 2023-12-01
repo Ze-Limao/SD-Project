@@ -37,7 +37,6 @@ public class ClientControler {
         return null;
     }
     public void askQuery() {
-
         int i;
         while ((i = menu.clientMenu()) != 0) {
             ask += 1;
