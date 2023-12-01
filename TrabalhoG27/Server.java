@@ -24,7 +24,7 @@ public class Server {
                 try (c) {
 
                     for (;;) {
-                        Frame frame = c.receiveFromPC();
+                        Frame frame = c.receive();
                         if (frame.src != 1){
                             System.out.println("received something from src:" + frame.src);
                             return;

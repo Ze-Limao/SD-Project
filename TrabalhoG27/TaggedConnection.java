@@ -121,11 +121,13 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
-    public Frame receiveFromPC() throws IOException{
+    public Frame receive() throws IOException {
+        this.readLock.lock();
         try{
             int tag = in.readInt();
             int src = in.readInt();
             int ask = in.readInt();
+            if (src == 1) {
                 switch (tag) {
                     case 1, 0 -> {
                         Account acc = Account.deserialize(in);
@@ -140,20 +142,8 @@ public class TaggedConnection implements AutoCloseable {
                     }
                     default -> System.out.println("not implemented tag on receive");
                 }
-            System.out.println("not implemented yet //" + tag + "//" + src + "//");
-            return null;
-
-        } finally {
-            this.readLock.unlock();
-        }
-    }
-
-    public Frame receiveFromServer() throws IOException {
-        this.readLock.lock();
-        try{
-            int tag = in.readInt();
-            int src = in.readInt();
-            int ask = in.readInt();
+            }
+            else if (src == 0) {
                 switch (tag) {
                     case 1 -> {
                         return new Frame(tag, src,ask, in.readBoolean());
@@ -171,6 +161,7 @@ public class TaggedConnection implements AutoCloseable {
                     }
                     default -> System.out.println("not implemented tag on receive");
                 }
+            }
             System.out.println("not implemented yet //" + tag + "//" + src + "//");
             return null;
         } finally {

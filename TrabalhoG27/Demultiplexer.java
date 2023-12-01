@@ -11,14 +11,14 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Demultiplexer {
      private TaggedConnection c;
      private ReentrantLock lock = new ReentrantLock();
-     private Map<Integer, FrameOrders> map = new HashMap<>();
+     private Map<Integer, FramesTag> map = new HashMap<>();
     private IOException exception = null;
-     private class FrameOrders{
+     private class FramesTag {
          int waitingThreads = 0;
          Queue<Object> queue = new ArrayDeque<>();
          Condition cond = lock.newCondition();
 
-         public FrameOrders(){}
+         public FramesTag(){}
      }
 
      public Demultiplexer(TaggedConnection c){
@@ -30,16 +30,16 @@ public class Demultiplexer {
         Thread newThread = new Thread(() -> {
             try{
                 while(true) {
-                    Frame frame = c.receiveFromPC();
+                    Frame frame = c.receive();
                     lock.lock();
                     try{
-                        FrameOrders fo = map.get(frame.tag);
-                        if(fo == null){
-                            fo = new FrameOrders();
-                            map.put(frame.tag, fo);
+                        FramesTag list = map.get(frame.tag);
+                        if(list == null){
+                            list = new FramesTag();
+                            map.put(frame.tag, list);
                         }
-                        fo.queue.add(frame.obj);
-                        fo.cond.signal();
+                        list.queue.add(frame.obj);
+                        list.cond.signal();
                     }
                     finally {
                         lock.unlock();
@@ -80,8 +80,37 @@ public class Demultiplexer {
         c.send(tag, src, ask, activeTasks, availableMemory);
     }
 
-    public void receive(){
-        return ;
+    public Object receive(int tag) throws IOException, InterruptedException{
+         lock.lock();
+         FramesTag list;
+        try{
+            list = map.get(tag);
+            if(list == null){
+                list = new FramesTag();
+                map.put(tag, list);
+            }
+            list.waitingThreads++;
+            while(true){
+                if(list.queue.isEmpty() != true){
+                    list.waitingThreads--;
+                    Object r = list.queue.poll();
+                    if((list.waitingThreads == 0) && (list.queue.isEmpty() == true)){
+                        map.remove(tag);
+                    }
+                    return r;
+                }
+                if(exception != null){
+                    throw exception;
+                }
+                list.cond.await();
+            }
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
+    public void close() throws IOException{
+         this.c.close();
+    }
 }

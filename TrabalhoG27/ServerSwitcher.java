@@ -20,7 +20,7 @@ public class ServerSwitcher {
     public void execute() throws IOException {
 
         for (;;) {
-            Frame frame = c.receiveFromPC();
+            Frame frame = c.receive();
             if (frame.src != 1){
                 System.out.println("recieved something from src:" + frame.src);
                 return;
