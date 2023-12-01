@@ -1,4 +1,4 @@
-package TrabalhoG27;
+package SD.TrabalhoG27;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -24,7 +24,7 @@ public class Server {
                 try (c) {
 
                     for (;;) {
-                        Frame frame = c.receive();
+                        Frame frame = c.receiveFromPC();
                         if (frame.src != 1){
                             System.out.println("received something from src:" + frame.src);
                             return;

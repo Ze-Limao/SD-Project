@@ -1,4 +1,4 @@
-package TrabalhoG27;
+package SD.TrabalhoG27;
 
 import java.util.HashMap;
 import java.util.Map;
