@@ -1,4 +1,4 @@
-package TrabalhoG27;
+package SD.TrabalhoG27;
 
 import sd23.JobFunction;
 import sd23.JobFunctionException;
@@ -19,7 +19,7 @@ public class ServerSwitcher {
 
     public void execute() throws IOException {
         for (;;) {
-            Frame frame = c.receive();
+            Frame frame = c.receiveFromPC();
             if (frame.src != 1){
                 System.out.println("recieved something from src:" + frame.src);
                 return;

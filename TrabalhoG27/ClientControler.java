@@ -1,4 +1,4 @@
-package TrabalhoG27;
+package SD.TrabalhoG27;
 
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class ClientControler {
         while ((menu.mainMenu())!= 0) {
             acc = menu.RegisterMenu();
             c.send(1,1,ask, acc);
-            Frame frame = c.receive();
+            Frame frame = c.receiveFromServer();
             if (frame.tag == 1 && frame.src == 0){
                 Boolean loginSucceeded = (Boolean)frame.obj;
                 if (loginSucceeded) {
@@ -47,7 +47,7 @@ public class ClientControler {
                 Thread thread = new Thread (() -> {
                     try {
                         c.send(2, 1, ask, quest);
-                        Frame frame = c.receive();
+                        Frame frame = c.receiveFromServer();
                         if (frame.tag == 2 && frame.src == 0) {
                             System.out.println("quest number: "+ frame.ask +" content:" + frame.obj);//o que querem daqui
                         }
@@ -62,7 +62,7 @@ public class ClientControler {
                 Thread thread = new Thread (() -> {
                 try {
                     c.send(3, 1, ask, "");
-                    Frame frame = c.receive();
+                    Frame frame = c.receiveFromServer();
                     if (frame.tag == 3 && frame.src == 0) {
                         System.out.println("quest number: "+ frame.ask +" content:" + frame.obj);
                     }
