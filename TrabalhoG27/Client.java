@@ -28,14 +28,11 @@ import java.net.Socket;
  * */
 
 public class Client {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
         //make connection
         Socket s = new Socket("localhost", 12345);
-        // TaggedConnection c = new TaggedConnection(s);
-
-        Demultiplexer m = new Demultiplexer(new TaggedConnection(s));
-        m.start();
-        ClientControler cc = new ClientControler(m);
+        TaggedConnection c = new TaggedConnection(s);
+        ClientControler cc = new ClientControler(c);
         Account acc = null;
         try {
             //get client list
@@ -55,4 +52,3 @@ public class Client {
         //execute queries using that cient
     }
 }
-

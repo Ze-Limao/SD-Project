@@ -5,24 +5,24 @@ import java.io.IOException;
 
 public class ClientControler {
     private final Menu menu;
-    private final Demultiplexer m;
+    private final TaggedConnection c;
     int ask;
 
 
-    public ClientControler(Demultiplexer m) {
+    public ClientControler(TaggedConnection c) {
         this.menu = new Menu();
-        this.m = m;
+        this.c = c;
         ask = 0;
     }
 
-    public Account login() throws Exception {
+    public Account login() throws IOException {
 
         Account acc;
         ask+=1;
         while ((menu.mainMenu())!= 0) {
             acc = menu.RegisterMenu();
-            m.send(1,1,ask, acc);
-            Frame frame = m.receive(1);
+            c.send(1,1,ask, acc);
+            Frame frame = c.receive();
             if (frame.tag == 1 && frame.src == 0){
                 Boolean loginSucceeded = (Boolean)frame.obj;
                 if (loginSucceeded) {
@@ -36,7 +36,7 @@ public class ClientControler {
         }
         return null;
     }
-    public void askQuery(){
+    public void askQuery() {
 
         int i;
         while ((i = menu.clientMenu()) != 0) {
@@ -46,12 +46,12 @@ public class ClientControler {
                 Quest quest = new Quest(1000, menu.askQuest());
                 Thread thread = new Thread (() -> {
                     try {
-                        m.send(2, 1, ask, quest);
-                        Frame frame = m.receive(2);
+                        c.send(2, 1, ask, quest);
+                        Frame frame = c.receive();
                         if (frame.tag == 2 && frame.src == 0) {
                             System.out.println("quest number: "+ frame.ask +" content:" + frame.obj);//o que querem daqui
                         }
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 });
@@ -61,13 +61,13 @@ public class ClientControler {
             else if (i == 2){
                 Thread thread = new Thread (() -> {
                     try {
-                        m.send(3, 1, ask, "");
-                        Frame frame = m.receive(3);
+                        c.send(3, 1, ask, "");
+                        Frame frame = c.receive();
                         if (frame.tag == 3 && frame.src == 0) {
                             System.out.println("quest number: "+ frame.ask +" content:" + frame.obj);
                         }
                     }
-                    catch (Exception e) {
+                    catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 });
@@ -77,6 +77,6 @@ public class ClientControler {
     }
     public void logout(Account acc) throws IOException {
         if(acc != null)
-            m.send(0,1,ask,acc);
+            c.send(0,1,ask,acc);
     }
 }
