@@ -1,5 +1,6 @@
 package SD.TrabalhoG27;
 
+import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -7,20 +8,26 @@ public class Menu  {
 
     public Menu (){
     }
-    public int mainMenu(){
-        int option =-1;
+    public static int mainMenu() {
+        int option = -1;
         Scanner input = new Scanner(System.in);
 
         while (option != 0 && option != 1) {
+            try {
+                System.out.println("""
+                        \tWelcome To Our Project
 
-            System.out.println("""
-                    \tWelcome To Our Project
-
-                    1 -> Login
-                    0 -> Exit
-                    chose wisely:""");
-            option = input.nextInt();
+                        1 -> Login
+                        0 -> Exit
+                        Choose wisely:""");
+                option = input.nextInt();
+            } catch (InputMismatchException e) {
+                // Limpar o buffer do scanner
+                input.nextLine();
+                System.out.println("Invalid input. Please enter a valid integer.");
+            }
         }
+
         return option;
     }
 
@@ -28,7 +35,7 @@ public class Menu  {
 
         System.out.println("\t\tRegist Yourserlf");
         /**
-//password não é escrita
+         //password não é escrita
          java.io.Console console = System.console();
 
          * if (console != null) {
@@ -85,7 +92,7 @@ public class Menu  {
     public String askQuest(){
         System.out.println("quest:");
         Scanner input = new Scanner(System.in);
-            return input.nextLine();
+        return input.nextLine();
 
     }
 

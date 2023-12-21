@@ -9,24 +9,25 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Demultiplexer {
-     private TaggedConnection c;
-     private ReentrantLock lock = new ReentrantLock();
-     private Map<Integer, FramesTag> map = new HashMap<>();
+    private TaggedConnection c;
+    private ReentrantLock lock = new ReentrantLock();
+    //tag e Pedidos
+    private Map<Integer, FramesTag> map = new HashMap<>();
     private IOException exception = null;
-     private class FramesTag {
-         int waitingThreads = 0;
-         Queue<Object> queue = new ArrayDeque<>();
-         Condition cond = lock.newCondition();
+    private class FramesTag {
+        int waitingThreads = 0;
+        Queue<Frame> queue = new ArrayDeque<>();
+        Condition cond = lock.newCondition();
 
-         public FramesTag(){}
-     }
+        public FramesTag(){}
+    }
 
-     public Demultiplexer(TaggedConnection c){
-         this.c = c;
-     }
+    public Demultiplexer(TaggedConnection c){
+        this.c = c;
+    }
 
     // Inicia uma nova thread para receber frames continuamente da conexão e processá-los.
-     public void start(){
+    public void start(){
         Thread newThread = new Thread(() -> {
             try{
                 while(true) {
@@ -38,7 +39,7 @@ public class Demultiplexer {
                             list = new FramesTag();
                             map.put(frame.tag, list);
                         }
-                        list.queue.add(frame.obj);
+                        list.queue.add(frame);
                         list.cond.signal();
                     }
                     finally {
@@ -49,17 +50,17 @@ public class Demultiplexer {
             catch(IOException e){
                 exception = e;
             }
-         });
+        });
         newThread.start();
-     }
+    }
 
 
     public void send(int tag, int src, int ask, Account acc) throws IOException{
-         c.send(tag, src, ask, acc);
+        c.send(tag, src, ask, acc);
     }
 
     public void send(int tag, int src, int ask, Quest quest) throws IOException {
-         c.send(tag, src, ask, quest);
+        c.send(tag, src, ask, quest);
     }
 
     public void send(int tag, int src, int ask, boolean bool) throws IOException{
@@ -80,9 +81,9 @@ public class Demultiplexer {
         c.send(tag, src, ask, activeTasks, availableMemory);
     }
 
-    public Object receive(int tag) throws IOException, InterruptedException{
-         lock.lock();
-         FramesTag list;
+    public Frame receive(int tag) throws IOException, InterruptedException{
+        lock.lock();
+        FramesTag list;
         try{
             list = map.get(tag);
             if(list == null){
@@ -93,7 +94,7 @@ public class Demultiplexer {
             while(true){
                 if(list.queue.isEmpty() != true){
                     list.waitingThreads--;
-                    Object r = list.queue.poll();
+                    Frame r = list.queue.poll();
                     if((list.waitingThreads == 0) && (list.queue.isEmpty() == true)){
                         map.remove(tag);
                     }
@@ -111,6 +112,6 @@ public class Demultiplexer {
     }
 
     public void close() throws IOException{
-         this.c.close();
+        this.c.close();
     }
 }
