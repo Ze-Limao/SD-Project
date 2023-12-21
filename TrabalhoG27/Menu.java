@@ -72,21 +72,35 @@ public class Menu  {
         return new Account(username, password);
     }
 
-    public int clientMenu(){
+    public static int clientMenu() {
         int option = -1;
         Scanner input = new Scanner(System.in);
 
         while (option != 1 && option != 0 && option != 2) {
-            System.out.println( """
+            System.out.println("""
                     \t\tWelcome
                         
                     1 -> Make a Quest
                     2 -> Get Server statistics
                     0 -> Logout""");
-            option = input.nextInt();
-        }
-        return option;
 
+            try {
+                // Verifica se o próximo token é um número
+                if (input.hasNextInt()) {
+                    option = input.nextInt();
+                } else {
+                    // Limpa o buffer do scanner em caso de entrada inválida
+                    input.next();
+                    System.out.println("Invalid input. Please enter a number.");
+                }
+            } catch (InputMismatchException e) {
+                // Limpa o buffer do scanner em caso de exceção de tipo de entrada
+                input.next();
+                System.out.println("Invalid input. Please enter a valid number.");
+            }
+        }
+
+        return option;
     }
 
     public String askQuest(){

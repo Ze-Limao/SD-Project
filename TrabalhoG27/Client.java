@@ -28,11 +28,14 @@ import java.net.Socket;
  * */
 
 public class Client {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         //make connection
         Socket s = new Socket("localhost", 12345);
-        TaggedConnection c = new TaggedConnection(s);
-        ClientControler cc = new ClientControler(c);
+        // TaggedConnection c = new TaggedConnection(s);
+
+        Demultiplexer m = new Demultiplexer(new TaggedConnection(s));
+        m.start();
+        ClientControler cc = new ClientControler(m);
         Account acc = null;
         try {
             //get client list
