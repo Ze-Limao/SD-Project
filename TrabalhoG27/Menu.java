@@ -99,7 +99,6 @@ public class Menu  {
                 System.out.println("Invalid input. Please enter a valid number.");
             }
         }
-
         return option;
     }
 
