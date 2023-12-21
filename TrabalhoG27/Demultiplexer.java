@@ -31,6 +31,7 @@ public class Demultiplexer {
         Thread newThread = new Thread(() -> {
             try{
                 while(true) {
+                 //   System.out.println("estou aqui");
                     Frame frame = c.receive();
                     lock.lock();
                     try{
@@ -40,6 +41,9 @@ public class Demultiplexer {
                             map.put(frame.tag, list);
                         }
                         list.queue.add(frame);
+                      //  for (Frame f : list.queue) {
+                        //    System.out.println("frame do demultiplexer"+ f.obj);
+                        //}
                         list.cond.signal();
                     }
                     finally {
