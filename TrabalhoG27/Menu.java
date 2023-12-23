@@ -1,7 +1,7 @@
 package SD.TrabalhoG27;
 
 import java.util.InputMismatchException;
-import java.util.Map;
+import java.io.*;
 import java.util.Scanner;
 
 public class Menu  {
@@ -102,11 +102,28 @@ public class Menu  {
         return option;
     }
 
-    public String askQuest(){
-        System.out.println("quest:");
+    public String askFilepath() throws IOException {
         Scanner input = new Scanner(System.in);
+        System.out.println("filepath:"); //
         return input.nextLine();
+    }
 
+    public String askQuest(String filepath) throws IOException{
+        StringBuilder quest = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                quest.append(line).append("\n");
+            }
+        }
+        return quest.toString();
+    }
+
+    public void saveResultsInFile(String result) throws IOException {
+        String filepath = "tests/results";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
+            writer.write(result + "\n\n");
+        }
     }
 
 }

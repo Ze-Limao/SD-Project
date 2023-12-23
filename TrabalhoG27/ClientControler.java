@@ -36,20 +36,23 @@ public class ClientControler {
         }
         return null;
     }
-    public void askQuery(){
+    public void askQuery() throws IOException{
 
         int i;
         while ((i = menu.clientMenu()) != 0) {
             ask += 1;
-            //askquest
+            //ask quest
             if (i == 1) {
-                Quest quest = new Quest(1000, menu.askQuest());
+                String filepath = menu.askFilepath();
+                Quest quest = new Quest(1000, menu.askQuest(filepath));
                 Thread thread = new Thread (() -> {
                     try {
                         m.send(2, ask, quest);
                         Frame frame = m.receive(2);
                         if (frame.tag == 2) {
-                            System.out.println("quest number: "+ frame.ask +" content:" + frame.obj);//o que querem daqui
+                            String result = "quest number " + frame.ask + "\ncontent:" + frame.obj;
+                            System.out.println(result);     //o que querem daqui
+                            menu.saveResultsInFile(result);
                         }
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -57,7 +60,7 @@ public class ClientControler {
                 });
                 thread.start();
             }
-            //askstats
+            //ask stats
             else if (i == 2){
                 Thread thread = new Thread (() -> {
                     try {
