@@ -86,6 +86,7 @@ public class NewServer {
                                     System.out.println("got here");
 
                                     c.send(2,frame.ask,result);
+                                    stats.endTask(q.getMemory());
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -94,7 +95,6 @@ public class NewServer {
                             };
                             Thread t = new Thread(response);
                             t.start();
-                            stats.endTask(q.getMemory());
                         }
 
                         //devolver as estatisticas
