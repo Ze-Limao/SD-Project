@@ -5,7 +5,6 @@ import java.io.*;
 import java.util.Scanner;
 
 public class Menu  {
-
     public static int mainMenu() {
         int option = -1;
         Scanner input = new Scanner(System.in);
@@ -106,8 +105,15 @@ public class Menu  {
         return input.nextLine();
     }
 
-    public static String askQuest(String filepath) throws IOException{
+    public static String askQuest() throws IOException{
         StringBuilder quest = new StringBuilder();
+        String filepath = askFilepath();
+        File file = new File(filepath);
+        while (!file.exists()) {
+            System.out.println();
+            filepath = askFilepath();
+            file = new File(filepath);
+        }
         try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
             String line;
             while ((line = reader.readLine()) != null) {

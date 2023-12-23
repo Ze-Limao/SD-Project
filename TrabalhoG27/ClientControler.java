@@ -41,8 +41,7 @@ public class ClientControler {
             ask += 1;
             //ask quest
             if (i == 1) {
-                String filepath = Menu.askFilepath();
-                Quest quest = new Quest(1000, Menu.askQuest(filepath));
+                Quest quest = new Quest(1000, Menu.askQuest());
                 Thread thread = new Thread (() -> {
                     try {
                         m.send(2, ask, quest);

@@ -11,9 +11,10 @@ public class WorkTeam {
     private final Lock writeLock = new ReentrantLock();
     private final PriorityQueue<Integer> availableWorkers= new PriorityQueue<>();
     private final Lock l = new ReentrantLock();
-    private final Condition cond = l.newCondition();
-    private Integer worker_counter = 0; // Workers next job
-    private Integer queue_counter = 0; // Lugar da fila de espera
+    //private final Condition cond = l.newCondition();
+    private final List<Condition> conds = new ArrayList<>();
+    private Integer worker_counter = -1; // Workers next job
+    private Integer queue_counter = -1; // Lugar da fila de espera
 
 
     public WorkTeam() {
@@ -57,13 +58,17 @@ public class WorkTeam {
         this.l.lock();
         availableWorkers.add(id);
         worker_counter++;
-        cond.signalAll();
+        if(queue_counter >= worker_counter){
+            conds.get(worker_counter).signal();
+        }
         this.l.unlock();
     }
 
     public TaggedConnection getWorker() throws InterruptedException {
         this.l.lock();
         Integer q = ++queue_counter;
+        Condition cond = l.newCondition();
+        conds.add(cond);
         while (q > worker_counter) {
             cond.await();
         }
