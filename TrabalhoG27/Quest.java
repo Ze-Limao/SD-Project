@@ -21,6 +21,13 @@ public class Quest {
         return code;
     }
 
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Quest quest = (Quest) o;
+        return this.memory == quest.memory && this.code.equals(quest.code);
+    }
+
     public void serialize(DataOutputStream out) throws IOException {
         out.writeInt(memory);
         out.writeUTF(code);
