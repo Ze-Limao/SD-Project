@@ -31,8 +31,7 @@ public class Demultiplexer {
         Thread newThread = new Thread(() -> {
             try{
                 while(true) {
-                 //   System.out.println("estou aqui");
-                    Frame frame = c.receive();
+                    Frame frame = c.receiveFromServer();
                     lock.lock();
                     try{
                         FramesTag list = map.get(frame.tag);
@@ -59,30 +58,30 @@ public class Demultiplexer {
     }
 
 
-    public void send(int tag, int src, int ask, Account acc) throws IOException{
-        c.send(tag, src, ask, acc);
+    public void send(int tag, int ask, Account acc) throws IOException{
+        c.send(tag, ask, acc);
     }
 
-    public void send(int tag, int src, int ask, Quest quest) throws IOException {
-        c.send(tag, src, ask, quest);
+    public void send(int tag, int ask, Quest quest) throws IOException {
+        c.send(tag, ask, quest);
     }
 
-    public void send(int tag, int src, int ask, boolean bool) throws IOException{
-        c.send(tag, src, ask, bool);
+    public void send(int tag, int ask, boolean bool) throws IOException{
+        c.send(tag, ask, bool);
     }
-    public void send(int tag, int src, int ask, String str) throws IOException{
-        c.send(tag, src, ask, str);
+    public void send(int tag, int ask, String str) throws IOException{
+        c.send(tag, ask, str);
     }
-    public void send(int tag, int src, int ask, boolean bool, byte[] b) throws IOException{
-        c.send(tag, src, ask, bool, b);
-    }
-
-    public void send(int tag, int src, int ask, boolean bool, int err, String msg) throws IOException{
-        c.send(tag, src, ask, bool, err, msg);
+    public void send(int tag, int ask, boolean bool, byte[] b) throws IOException{
+        c.send(tag, ask, bool, b);
     }
 
-    public void send(int tag, int src, int ask, int activeTasks, int availableMemory) throws IOException{
-        c.send(tag, src, ask, activeTasks, availableMemory);
+    public void send(int tag, int ask, boolean bool, int err, String msg) throws IOException{
+        c.send(tag, ask, bool, err, msg);
+    }
+
+    public void send(int tag, int ask, int activeTasks, int availableMemory) throws IOException{
+        c.send(tag, ask, activeTasks, availableMemory);
     }
 
     public Frame receive(int tag) throws IOException, InterruptedException{
@@ -96,10 +95,10 @@ public class Demultiplexer {
             }
             list.waitingThreads++;
             while(true){
-                if(list.queue.isEmpty() != true){
+                if(!list.queue.isEmpty()){
                     list.waitingThreads--;
                     Frame r = list.queue.poll();
-                    if((list.waitingThreads == 0) && (list.queue.isEmpty() == true)){
+                    if((list.waitingThreads == 0) && (list.queue.isEmpty())){
                         map.remove(tag);
                     }
                     return r;

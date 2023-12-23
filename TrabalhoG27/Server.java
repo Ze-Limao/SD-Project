@@ -7,12 +7,13 @@ import sd23.*;
 
 
 public class Server {
-    final static int WORKERS_PER_CONNECTION = 10;
+    final static int WORKERS_PER_CONNECTION = 3;
 
     private static final Accounts accounts = new Accounts();
     private static final ReentrantLock lock = new ReentrantLock();
 
     private static final Statistics stats = new Statistics(10000);
+
 
     public static void main(String[] args) throws Exception {
         ServerSocket ss = new ServerSocket(12345);
@@ -24,11 +25,7 @@ public class Server {
                 try (c) {
 
                     for (;;) {
-                        Frame frame = c.receive();
-                        if (frame.src != 1){
-                            System.out.println("received something from src:" + frame.src);
-                            return;
-                        }
+                        Frame frame = c.receiveFromClient();
                         if (frame.tag == 0){
                             System.out.println("Got logout attempt");
                             accounts.setActive(((Account)frame.obj).getName(), false);
@@ -38,7 +35,7 @@ public class Server {
                             System.out.println("Got login attempt");
 
                             lock.lock();
-                            c.send(1,0, frame.ask, accounts.loginAttempt((Account)frame.obj));
+                            c.send(1, frame.ask, accounts.loginAttempt((Account)frame.obj));
                             lock.unlock();
                         }
 
@@ -53,17 +50,17 @@ public class Server {
                                 stats.endTask(q.getMemory());
                                 // utilizar o resultado ou reportar o erro
                                 System.err.println("success, returned "+output.length+" bytes");
-                                c.send(2,0, frame.ask, true,output);
+                                c.send(2, frame.ask, true,output);
                             } catch (JobFunctionException e) {
                                 System.err.println("job failed: code=" + e.getCode() + " message=" + e.getMessage());
-                                c.send(2,0,frame.ask, false,e.getCode(),e.getMessage());
+                                c.send(2,frame.ask, false,e.getCode(),e.getMessage());
                             }
                         }
                         else if (frame.tag == 3){
-                            c.send(3,0,frame.ask, stats.getAvailableMemory(), stats.getActiveTasks());
+                            c.send(3,frame.ask, stats.getAvailableMemory(), stats.getActiveTasks());
                         }
                         else {
-                            System.out.println("not implemented yet server-ln59 ");
+                            System.out.println("not implemented yet server-ln63 ");
                         }
                     }
 

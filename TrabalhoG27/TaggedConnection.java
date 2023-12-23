@@ -20,11 +20,10 @@ public class TaggedConnection implements AutoCloseable {
         this.in = new DataInputStream(new BufferedInputStream(s.getInputStream()));
     }
 
-    public void send(int tag, int src, int ask, Account acc) throws IOException {
+    public void send(int tag, int ask, Account acc) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
-            this.out.writeInt(src);
             this.out.writeInt(ask);
             acc.serialize(this.out);
             this.out.flush();
@@ -33,11 +32,10 @@ public class TaggedConnection implements AutoCloseable {
             this.writeLock.unlock();
         }
     }
-    public void send(int tag, int src, int ask, Quest quest) throws IOException {
+    public void send(int tag, int ask, Quest quest) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
-            this.out.writeInt(src);
             this.out.writeInt(ask);
             quest.serialize(this.out);
             this.out.flush();
@@ -47,11 +45,10 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
-    public void send(int tag, int src, int ask, boolean bool) throws IOException {
+    public void send(int tag, int ask, boolean bool) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
-            this.out.writeInt(src);
             this.out.writeInt(ask);
             this.out.writeBoolean(bool);
             this.out.flush();
@@ -61,11 +58,10 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
-    public void send(int tag, int src, int ask, String str) throws IOException {
+    public void send(int tag, int ask, String str) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
-            this.out.writeInt(src);
             this.out.writeInt(ask);
             this.out.writeUTF(str);
             this.out.flush();
@@ -75,11 +71,10 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
-    public void send(int tag, int src, int ask, boolean bool, byte[] b) throws IOException {
+    public void send(int tag, int ask, boolean bool, byte[] b) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
-            this.out.writeInt(src);
             this.out.writeInt(ask);
             this.out.writeBoolean(bool);
             this.out.writeInt(b.length);
@@ -90,11 +85,59 @@ public class TaggedConnection implements AutoCloseable {
             this.writeLock.unlock();
         }
     }
-    public void send(int tag, int src, int ask, boolean bool, int err, String msg) throws IOException {
+    public void send(boolean bool, byte[] b) throws IOException {
+        this.writeLock.lock();
+        try{
+            this.out.writeBoolean(bool);
+            this.out.writeInt(b.length);
+            this.out.write(b);
+            this.out.flush();
+        }
+        finally {
+            this.writeLock.unlock();
+        }
+    }
+
+    public void send(int tag) throws IOException{
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
-            this.out.writeInt(src);
+            this.out.flush();
+
+        }
+        finally {
+        this.writeLock.unlock();
+        }
+    }
+
+    public void send(String string) throws IOException{
+        this.writeLock.lock();
+        try{
+            this.out.writeUTF(string);
+            this.out.flush();
+
+        }
+        finally {
+            this.writeLock.unlock();
+        }
+    }
+    public void send(boolean bool, String string) throws IOException{
+        this.writeLock.lock();
+        try{
+            this.out.writeBoolean(bool);
+            this.out.writeUTF(string);
+            this.out.flush();
+
+        }
+        finally {
+            this.writeLock.unlock();
+        }
+    }
+
+    public void send(int tag, int ask, boolean bool, int err, String msg) throws IOException {
+        this.writeLock.lock();
+        try{
+            this.out.writeInt(tag);
             this.out.writeInt(ask);
             this.out.writeBoolean(bool);
             this.out.writeInt(err);
@@ -105,12 +148,24 @@ public class TaggedConnection implements AutoCloseable {
             this.writeLock.unlock();
         }
     }
-
-    public void send(int tag, int src, int ask, int activeTasks, int availableMemory) throws IOException {
+    public void send(int tag, boolean bool, int err, String msg) throws IOException {
         this.writeLock.lock();
         try{
             this.out.writeInt(tag);
-            this.out.writeInt(src);
+            this.out.writeBoolean(bool);
+            this.out.writeInt(err);
+            this.out.writeUTF(msg);
+            this.out.flush();
+        }
+        finally {
+            this.writeLock.unlock();
+        }
+    }
+
+    public void send(int tag,  int ask, int activeTasks, int availableMemory) throws IOException {
+        this.writeLock.lock();
+        try{
+            this.out.writeInt(tag);
             this.out.writeInt(ask);
             this.out.writeInt(activeTasks);
             this.out.writeInt(availableMemory);
@@ -121,53 +176,95 @@ public class TaggedConnection implements AutoCloseable {
         }
     }
 
-    public Frame receive() throws IOException {
+    public Frame receiveFromServer() throws IOException {
         this.readLock.lock();
+
         try{
             int tag = in.readInt();
-            int src = in.readInt();
             int ask = in.readInt();
-            if (src == 1) {
-                switch (tag) {
-                    case 1, 0 -> {
-                        Account acc = Account.deserialize(in);
-                        return new Frame(tag, src, ask, acc);
+            switch (tag) {
+                case 1 -> {
+                    return new Frame(tag, ask, in.readBoolean());
+                }
+                /*case 2 -> {
+                    return new Frame(tag,ask,in.readUTF());
+                }*/
+                case 2 -> {
+                    if (in.readBoolean()) {
+                        byte[] b = new byte[in.readInt()];
+                        in.readFully(b);
+                        return new Frame(tag, ask, Arrays.toString(b));
                     }
-                    case 2 -> {
-                        return new Frame(tag, src, ask, Quest.deserialize(in));
-                    }
-                    case 3 -> {
-                        in.readUTF();
-                        return new Frame(tag, src, ask, null);
-                    }
-                    default -> System.out.println("not implemented tag on receive");
+                    return new Frame(tag, ask, ("Error " + in.readInt() + ": " + in.readUTF()));
+                }
+                case 3 -> {
+                    return new Frame(tag, ask, "There is " + in.readInt() + " bytes available and " + in.readInt() + " tasks waiting");
+                }
+                default -> {
+                    System.out.println("not implemented yet //" + tag + "//");
+                    return null;
                 }
             }
-            else if (src == 0) {
-                switch (tag) {
-                    case 1 -> {
-                        return new Frame(tag, src,ask, in.readBoolean());
-                    }
-                    case 2 -> {
-                        if (in.readBoolean()) {
-                            byte[] b = new byte[in.readInt()];
-                            in.readFully(b);
-                            return new Frame(tag, src,ask, Arrays.toString(b));
-                        }
-                        return new Frame(tag, src,ask, ("Error " + in.readInt() + ": " + in.readUTF()));
-                    }
-                    case 3 -> {
-                        return new Frame(tag, src,ask, "There is " + in.readInt() + " bytes available and " + in.readInt() + " tasks waiting");
-                    }
-                    default -> System.out.println("not implemented tag on receive");
-                }
-            }
-            System.out.println("not implemented yet //" + tag + "//" + src + "//");
-            return null;
         } finally {
             this.readLock.unlock();
         }
     }
+    public Frame receiveFromClient() throws IOException {
+        this.readLock.lock();
+        try {
+            int tag = in.readInt();
+
+            if (tag == 253 || tag == 254) {
+
+                return new Frame(tag, 0, null);
+            }
+            int ask = in.readInt();
+
+            switch (tag) {
+                case 1, 0 -> {
+                    Account acc = Account.deserialize(in);
+                    return new Frame(tag, ask, acc);
+                }
+                case 2 -> {
+                    return new Frame(tag, ask, Quest.deserialize(in));
+                }
+                case 3 -> {
+                    in.readUTF();
+                    return new Frame(tag, ask, null);
+                }
+                default -> {
+                    System.out.println("not implemented yet 2 //" + tag + "//");
+                    return null;
+                }
+            }
+        } finally {
+            this.readLock.unlock();
+        }
+    }
+    public String receiveQuest() throws IOException {
+        this.readLock.lock();
+        try{
+            return (in.readUTF());
+        } finally {
+            this.readLock.unlock();
+        }
+    }
+    public String receiveResult()throws IOException{
+        this.readLock.lock();
+        try{
+            if (in.readBoolean()) {
+                byte[] b = new byte[in.readInt()];
+                in.readFully(b);
+
+                return Arrays.toString(b);
+            }
+            System.out.println("errormsg");
+            return (in.readUTF());
+        }finally {
+            this.readLock.unlock();
+        }
+    }
+
     public void close() throws IOException {
         this.readLock.lock();
         this.writeLock.lock();
