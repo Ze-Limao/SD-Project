@@ -4,13 +4,11 @@ package SD.TrabalhoG27;
 import java.io.IOException;
 
 public class ClientControler {
-    private final Menu menu;
     private final Demultiplexer m;
     int ask;
 
 
     public ClientControler(Demultiplexer m) {
-        this.menu = new Menu();
         this.m = m;
         ask = 0;
     }
@@ -19,8 +17,8 @@ public class ClientControler {
 
         Account acc;
         ask+=1;
-        while ((menu.mainMenu())!= 0) {
-            acc = menu.RegisterMenu();
+        while ((Menu.mainMenu())!= 0) {
+            acc = Menu.RegisterMenu();
             m.send(1,ask, acc);
             Frame frame = m.receive(1);
             if (frame.tag == 1){
@@ -39,12 +37,12 @@ public class ClientControler {
     public void askQuery() throws IOException{
 
         int i;
-        while ((i = menu.clientMenu()) != 0) {
+        while ((i = Menu.clientMenu()) != 0) {
             ask += 1;
             //ask quest
             if (i == 1) {
-                String filepath = menu.askFilepath();
-                Quest quest = new Quest(1000, menu.askQuest(filepath));
+                String filepath = Menu.askFilepath();
+                Quest quest = new Quest(1000, Menu.askQuest(filepath));
                 Thread thread = new Thread (() -> {
                     try {
                         m.send(2, ask, quest);
@@ -52,7 +50,7 @@ public class ClientControler {
                         if (frame.tag == 2) {
                             String result = "quest number " + frame.ask + "\ncontent:" + frame.obj;
                             System.out.println(result);     //o que querem daqui
-                            menu.saveResultsInFile(result);
+                            Menu.saveResultsInFile(result);
                         }
                     } catch (Exception e) {
                         throw new RuntimeException(e);

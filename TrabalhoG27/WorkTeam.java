@@ -1,16 +1,20 @@
 package SD.TrabalhoG27;
 
 import java.util.*;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class WorkTeam {
-    private List<TaggedConnection> workers = new ArrayList<>();
+    private final List<TaggedConnection> workers = new ArrayList<>();
     private final Lock readLock = new ReentrantLock();
     private final Lock writeLock = new ReentrantLock();
-
-    private PriorityQueue<Integer> availableWorkers= new PriorityQueue<>();
+    private final PriorityQueue<Integer> availableWorkers= new PriorityQueue<>();
     private final Lock l = new ReentrantLock();
+    private final Condition cond = l.newCondition();
+    private Integer worker_counter = 0; // Workers next job
+    private Integer queue_counter = 0; // Lugar da fila de espera
+
 
     public WorkTeam() {
     }
@@ -28,7 +32,7 @@ public class WorkTeam {
         int id = workers.indexOf(c);
         try {
             if (id == -1){
-                System.out.println(id + "doesnt exist in workers");
+                System.out.println(id + "doesn`t exist in workers");
                 return;
             }
         }finally {
@@ -52,15 +56,23 @@ public class WorkTeam {
         }
         this.l.lock();
         availableWorkers.add(id);
+        worker_counter++;
+        cond.signalAll();
         this.l.unlock();
     }
 
-    public TaggedConnection getWorker(){
+    public TaggedConnection getWorker() throws InterruptedException {
         this.l.lock();
-        Integer o = null;
-        while (o == null)
-            o = availableWorkers.poll();
+        Integer q = ++queue_counter;
+        while (q > worker_counter) {
+            cond.await();
+        }
+        Integer o = availableWorkers.poll();
         this.l.unlock();
+        if (o == null) {
+            System.out.println("o has null value.");
+            return null;
+        }
         this.readLock.lock();
         try {
             return workers.get(o);

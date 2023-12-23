@@ -6,8 +6,6 @@ import java.util.Scanner;
 
 public class Menu  {
 
-    public Menu (){
-    }
     public static int mainMenu() {
         int option = -1;
         Scanner input = new Scanner(System.in);
@@ -31,7 +29,7 @@ public class Menu  {
         return option;
     }
 
-    public Account RegisterMenu() {
+    public static Account RegisterMenu() {
 
         System.out.println("\t\tRegist Yourserlf");
         /**
@@ -102,13 +100,13 @@ public class Menu  {
         return option;
     }
 
-    public String askFilepath() throws IOException {
+    public static String askFilepath() throws IOException {
         Scanner input = new Scanner(System.in);
         System.out.println("filepath:"); //
         return input.nextLine();
     }
 
-    public String askQuest(String filepath) throws IOException{
+    public static String askQuest(String filepath) throws IOException{
         StringBuilder quest = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
             String line;
@@ -119,7 +117,7 @@ public class Menu  {
         return quest.toString();
     }
 
-    public void saveResultsInFile(String result) throws IOException {
+    public static void saveResultsInFile(String result) throws IOException {
         String filepath = "tests/results";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath, true))) {
             writer.write(result + "\n\n");

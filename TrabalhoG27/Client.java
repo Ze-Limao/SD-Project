@@ -42,7 +42,7 @@ public class Client {
             while (true) {
                 acc = cc.login();
                 if (acc == null) {
-                    return;
+                    System.exit(0);
                 }
                 cc.askQuery();
                 cc.logout(acc);

@@ -72,7 +72,12 @@ public class NewServer {
                             //inicia uma thread para resposta
                             Runnable response = () -> {
                                 //atribui a um worker disponivel o pedido
-                                TaggedConnection worker = wt.getWorker();
+                                TaggedConnection worker = null;
+                                try {
+                                    worker = wt.getWorker();
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
                                 try {
                                     worker.send(q.getCode());
 

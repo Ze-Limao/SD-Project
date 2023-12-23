@@ -186,17 +186,17 @@ public class TaggedConnection implements AutoCloseable {
                 case 1 -> {
                     return new Frame(tag, ask, in.readBoolean());
                 }
-                /*case 2 -> {
-                    return new Frame(tag,ask,in.readUTF());
-                }*/
                 case 2 -> {
+                    return new Frame(tag,ask,in.readUTF());
+                }
+                /*case 2 -> {
                     if (in.readBoolean()) {
                         byte[] b = new byte[in.readInt()];
                         in.readFully(b);
                         return new Frame(tag, ask, Arrays.toString(b));
                     }
                     return new Frame(tag, ask, ("Error " + in.readInt() + ": " + in.readUTF()));
-                }
+                }*/
                 case 3 -> {
                     return new Frame(tag, ask, "There is " + in.readInt() + " bytes available and " + in.readInt() + " tasks waiting");
                 }
