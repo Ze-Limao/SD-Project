@@ -9,10 +9,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Demultiplexer {
-    private TaggedConnection c;
-    private ReentrantLock lock = new ReentrantLock();
+    private final TaggedConnection c;
+    private final ReentrantLock lock = new ReentrantLock();
     //tag e Pedidos
-    private Map<Integer, FramesTag> map = new HashMap<>();
+    private final Map<Integer, FramesTag> map = new HashMap<>();
     private IOException exception = null;
     private class FramesTag {
         int waitingThreads = 0;

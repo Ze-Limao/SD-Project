@@ -1,14 +1,12 @@
 package SD.TrabalhoG27;
 
 
-import java.io.IOException;
 import java.net.Socket;
 
 /**
  * src = 0 <- server
  * src = 1 -> PC
  * tag0 -> logout
- *
  * tag1 -> enviar um nome e palavra passe
  *              tag + src + length+nome+legth+passe
  *         server deverá fazer lock desse client caso seja aceite
@@ -35,7 +33,7 @@ public class Client {
 
         Demultiplexer m = new Demultiplexer(new TaggedConnection(s));
         m.start();
-        ClientControler cc = new ClientControler(m);
+        ClientController cc = new ClientController(m);
         Account acc = null;
         try {
             //get client list

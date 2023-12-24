@@ -175,7 +175,7 @@ public class TaggedConnection implements AutoCloseable {
             this.writeLock.unlock();
         }
     }
-
+    //receive client<-server
     public Frame receiveFromServer() throws IOException {
         this.readLock.lock();
 
@@ -189,14 +189,6 @@ public class TaggedConnection implements AutoCloseable {
                 case 2 -> {
                     return new Frame(tag,ask,in.readUTF());
                 }
-                /*case 2 -> {
-                    if (in.readBoolean()) {
-                        byte[] b = new byte[in.readInt()];
-                        in.readFully(b);
-                        return new Frame(tag, ask, Arrays.toString(b));
-                    }
-                    return new Frame(tag, ask, ("Error " + in.readInt() + ": " + in.readUTF()));
-                }*/
                 case 3 -> {
                     return new Frame(tag, ask, "There is " + in.readInt() + " bytes available and " + in.readInt() + " tasks waiting");
                 }
@@ -209,6 +201,7 @@ public class TaggedConnection implements AutoCloseable {
             this.readLock.unlock();
         }
     }
+    //receive server<-client
     public Frame receiveFromClient() throws IOException {
         this.readLock.lock();
         try {
@@ -241,6 +234,7 @@ public class TaggedConnection implements AutoCloseable {
             this.readLock.unlock();
         }
     }
+    //Receiving the task on the worker
     public String receiveQuest() throws IOException {
         this.readLock.lock();
         try{
@@ -249,6 +243,7 @@ public class TaggedConnection implements AutoCloseable {
             this.readLock.unlock();
         }
     }
+    //Receiving the result from the worker
     public String receiveResult()throws IOException{
         this.readLock.lock();
         try{
@@ -258,7 +253,6 @@ public class TaggedConnection implements AutoCloseable {
 
                 return Arrays.toString(b);
             }
-            System.out.println("errormsg");
             return (in.readUTF());
         }finally {
             this.readLock.unlock();

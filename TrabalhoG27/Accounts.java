@@ -14,9 +14,6 @@ public class Accounts {
         this.lock = new ReentrantLock();
     }
 
-    public boolean isActive(String key){
-        return accounts.get(key).isActive();
-    }
     public void setActive(String key, boolean b){
         lock.lock();
         accounts.get(key).setActive(b);
@@ -31,9 +28,7 @@ public class Accounts {
                 b = true;
 
             } else if (accounts.get(acc.getName()).verifyPassword(acc) && !accounts.get(acc.getName()).isActive()) {
-                isActive(acc.getName());
                 setActive(acc.getName(), true);
-                isActive(acc.getName());
                 b = true;
             }
             return b;

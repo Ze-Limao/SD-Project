@@ -25,7 +25,7 @@ public class Worker {
                     c.send(true,output);
                 } catch (JobFunctionException e) {
                    String aux = ("job failed: code=" + e.getCode() + " message=" + e.getMessage());
-                    System.out.println(aux);
+                    System.err.println(aux);
                    c.send(false,aux);
                 }
             }

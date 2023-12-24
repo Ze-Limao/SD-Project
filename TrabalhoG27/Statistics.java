@@ -7,8 +7,8 @@ public class Statistics {
     private int availableMemory;
     private int activeTasks;
 
-    private ReentrantLock lock = new ReentrantLock();
-    private Condition cond = lock.newCondition();
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition cond = lock.newCondition();
 
 
     public Statistics(int memory) {
@@ -23,11 +23,16 @@ public class Statistics {
 
     public int getActiveTasks() {
         return activeTasks;
+
     }
+
+    /**Função responsavel por atualizar as estatisticas antes de uma task começar
+     * Se não tem memória disponivel espera até ter
+     * */
     public void newTask(int memory){
         try {
             this.lock.lock();
-            activeTasks += 1;
+            activeTasks ++;
             while (this.availableMemory<memory) {
                 cond.await();
             }
@@ -40,6 +45,7 @@ public class Statistics {
         }
     }
 
+    /**Função responsavel por atualizar as estatisticas depois de uma task acabar*/
     public void endTask(int memory){
         try {
             this.lock.lock();
