@@ -3,16 +3,16 @@ package SD.TrabalhoG27;
 
 import java.io.IOException;
 
-public class ClientControler {
+public class ClientController {
     private final Demultiplexer m;
     int ask;
 
 
-    public ClientControler(Demultiplexer m) {
+    public ClientController(Demultiplexer m) {
         this.m = m;
         ask = 0;
     }
-
+    /**metodo com a execução do login*/
     public Account login() throws Exception {
 
         Account acc;
@@ -34,6 +34,7 @@ public class ClientControler {
         }
         return null;
     }
+    /**metodo para processar uma querst*/
     public void askQuery() throws IOException{
 
         int i;
@@ -75,6 +76,7 @@ public class ClientControler {
             }
         }
     }
+    /**metodo para fazer o logout da conta*/
     public void logout(Account acc) throws IOException {
         if(acc != null)
             m.send(0,ask,acc);

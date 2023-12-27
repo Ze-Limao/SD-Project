@@ -17,9 +17,9 @@ public class WorkTeam {
     private Integer queue_counter = -1; // Lugar da fila de espera
 
 
-    public WorkTeam() {
-    }
+    public WorkTeam() {}
 
+    /**função que adiciona e disponibliza um novo worker*/
     public void setNewWorker(TaggedConnection c){
         this.readLock.lock();
         this.writeLock.lock();
@@ -28,6 +28,7 @@ public class WorkTeam {
         this.readLock.unlock();
         makeAvailable(c);
     }
+    /**função usada para manualmente remover um worker da lista de "disponiveis"(apenas usada quando o worker deixa de existir)*/
     public void removeWorker(TaggedConnection c){
         this.readLock.lock();
         int id = workers.indexOf(c);
@@ -41,9 +42,11 @@ public class WorkTeam {
         }
         this.l.lock();
         availableWorkers.remove(id);
+        worker_counter--;
         this.l.unlock();
     }
 
+    /**função usada para atualizar o estado de um worker para "disponivel"*/
     public void makeAvailable(TaggedConnection c){
         this.readLock.lock();
         int id = workers.indexOf(c);
@@ -64,6 +67,7 @@ public class WorkTeam {
         this.l.unlock();
     }
 
+    /**função que devolve o taggedConnection de um worker disponivel*/
     public TaggedConnection getWorker() throws InterruptedException {
         this.l.lock();
         Integer q = ++queue_counter;

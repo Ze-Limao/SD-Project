@@ -4,8 +4,6 @@ package SD.TrabalhoG27;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
-
 public class Account {
 
     private final String name;
