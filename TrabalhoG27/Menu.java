@@ -1,10 +1,28 @@
 package SD.TrabalhoG27;
 
+import java.rmi.ServerError;
 import java.util.InputMismatchException;
 import java.io.*;
-import java.util.Scanner;
+import java.util.*;
+import java.util.zip.ZipError;
+
+import static java.lang.Math.random;
 
 public class Menu  {
+    private static final List<String> tentativaMensagens = new ArrayList<>();
+
+    private static void addCenas() {
+        tentativaMensagens.add("\u001B[35m" + "Tenta novamente." + "\u001B[0m");
+        tentativaMensagens.add("\u001B[35m" + "Há terceira é de vez." + "\u001B[0m");
+        tentativaMensagens.add("\u001B[35m" + "Ou talvez não..." + "\u001B[0m");
+        tentativaMensagens.add("\u001B[35m" + "Tenta outra vez." + "\u001B[0m");
+        tentativaMensagens.add("\u001B[35m" + "És estúpido?" + "\u001B[0m");
+        tentativaMensagens.add("\u001B[35m" + "Mas estamos a brincar? O meu cão não precisa de 7 vezes para introduzir um um filepath!" + "\u001B[0m");
+        tentativaMensagens.add("\u001B[35m" + "Tutorial como ir buscar um filepath: \n1.Escrever um caminho que exista. \n2.Se estás a ler este passo podes te candidatar ao McDonalds." + "\u001B[0m");
+        tentativaMensagens.add("\u001B[35m" + "Nem o McDonalds te aceitaria man" + "\u001B[0m");
+        tentativaMensagens.add("\u001B[35m" + "Última tentativa, que eu já não te posso ver mais à frente, anda lá, oupa." + "\u001B[0m");
+    }
+
     public static int mainMenu() {
         int option = -1;
         Scanner input = new Scanner(System.in);
@@ -109,8 +127,14 @@ public class Menu  {
         StringBuilder quest = new StringBuilder();
         String filepath = askFilepath();
         File file = new File(filepath);
+        addCenas();
+        int n = 0;
         while (!file.exists()) {
-            System.out.println();
+            if(n == 9){
+                System.err.println("DESISTO.");
+                System.exit(0);
+            }
+            System.out.println(tentativaMensagens.get(n++));
             filepath = askFilepath();
             file = new File(filepath);
         }
