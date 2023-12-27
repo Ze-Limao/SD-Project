@@ -1,5 +1,7 @@
 package SD.TrabalhoG27;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -8,8 +10,7 @@ public class Statistics {
     private int activeTasks;
 
     private final ReentrantLock lock = new ReentrantLock();
-    private final Condition cond = lock.newCondition();
-
+    private final Queue<Condition> conds = new ArrayDeque<>();
 
     public Statistics(int memory) {
         this.availableMemory = memory;
@@ -33,9 +34,13 @@ public class Statistics {
         try {
             this.lock.lock();
             activeTasks ++;
-            while (this.availableMemory<memory) {
+            Condition cond = lock.newCondition();
+            if (this.availableMemory < memory)
+                conds.add(cond);
+
+            while (this.availableMemory<memory)
                 cond.await();
-            }
+
             this.availableMemory-= memory;
 
         } catch (InterruptedException e) {
@@ -51,8 +56,10 @@ public class Statistics {
             this.lock.lock();
             activeTasks -= 1;
             this.availableMemory += memory;
-            cond.signalAll();
 
+            if (!conds.isEmpty()) {
+                conds.poll().signal();
+            }
         }finally{
             this.lock.unlock();
         }

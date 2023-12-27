@@ -1,12 +1,8 @@
 package SD.TrabalhoG27;
 
-import java.rmi.ServerError;
 import java.util.InputMismatchException;
 import java.io.*;
 import java.util.*;
-import java.util.zip.ZipError;
-
-import static java.lang.Math.random;
 
 public class Menu  {
     private static final List<String> tentativaMensagens = new ArrayList<>();
@@ -18,7 +14,10 @@ public class Menu  {
         tentativaMensagens.add("\u001B[35m" + "Tenta outra vez." + "\u001B[0m");
         tentativaMensagens.add("\u001B[35m" + "És estúpido?" + "\u001B[0m");
         tentativaMensagens.add("\u001B[35m" + "Mas estamos a brincar? O meu cão não precisa de 7 vezes para introduzir um um filepath!" + "\u001B[0m");
-        tentativaMensagens.add("\u001B[35m" + "Tutorial como ir buscar um filepath: \n1.Escrever um caminho que exista. \n2.Se estás a ler este passo podes te candidatar ao McDonalds." + "\u001B[0m");
+        tentativaMensagens.add("""
+                \u001B[35mTutorial como ir buscar um filepath:\s
+                1.Escrever um caminho que exista.\s
+                2.Se estás a ler este passo podes te candidatar ao McDonalds.\u001B[0m""");
         tentativaMensagens.add("\u001B[35m" + "Nem o McDonalds te aceitaria man" + "\u001B[0m");
         tentativaMensagens.add("\u001B[35m" + "Última tentativa, que eu já não te posso ver mais à frente, anda lá, oupa." + "\u001B[0m");
     }
@@ -30,16 +29,16 @@ public class Menu  {
         while (option != 0 && option != 1) {
             try {
                 System.out.println("""
-                        \tWelcome To Our Project
+                        \tBem vindo ao nosso Projeto
 
-                        1 -> Login
-                        0 -> Exit
-                        Choose wisely:""");
+                        1 -> Iniciar Sessão
+                        0 -> Sair
+                        """);
                 option = input.nextInt();
             } catch (InputMismatchException e) {
                 // Limpar o buffer do scanner
                 input.nextLine();
-                System.out.println("Invalid input. Please enter a valid integer.");
+                System.out.println("Input invalido, por favor insira um número inteiro válido.");
             }
         }
 
@@ -48,14 +47,14 @@ public class Menu  {
 
     public static Account RegisterMenu() {
 
-        System.out.println("\t\tRegist Yourserlf");
+        System.out.println("\t\tRegiste-se");
         //password é escrita
         Scanner input = new Scanner(System.in);
 
-        System.out.println("username: ");
+        System.out.println("nome: ");
         String username = input.nextLine();
 
-        System.out.println("Password: ");
+        System.out.println("Palavra-passe: ");
         String password = input.nextLine();
 
         return new Account(username, password);
@@ -67,11 +66,11 @@ public class Menu  {
 
         while (option != 1 && option != 0 && option != 2) {
             System.out.println("""
-                    \t\tWelcome
+                    \t\tbem vindo
                         
-                    1 -> Make a Quest
-                    2 -> Get Server statistics
-                    0 -> Logout""");
+                    1 -> Fazer um pedido
+                    2 -> pedir o estado ao servidor
+                    0 -> sair""");
 
             try {
                 // Verifica se o próximo token é um número
@@ -80,12 +79,12 @@ public class Menu  {
                 } else {
                     // Limpa o buffer do scanner em caso de entrada inválida
                     input.next();
-                    System.out.println("Invalid input. Please enter a number.");
+                    System.out.println("Input invalido, por favor insira um número inteiro válido");
                 }
             } catch (InputMismatchException e) {
                 // Limpa o buffer do scanner em caso de exceção de tipo de entrada
                 input.next();
-                System.out.println("Invalid input. Please enter a valid number.");
+                System.out.println("Input invalido, por favor insira um número inteiro válido");
             }
         }
         return option;
