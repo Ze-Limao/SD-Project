@@ -72,6 +72,9 @@ public class Demultiplexer {
     public void send(int tag, int ask, String str) throws IOException{
         c.send(tag, ask, str);
     }
+    public void send(int tag, int ask) throws IOException{
+        c.send(tag, ask);
+    }
     public void send(int tag, int ask, boolean bool, byte[] b) throws IOException{
         c.send(tag, ask, bool, b);
     }

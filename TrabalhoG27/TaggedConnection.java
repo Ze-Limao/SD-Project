@@ -70,6 +70,17 @@ public class TaggedConnection implements AutoCloseable {
             this.writeLock.unlock();
         }
     }
+    public void send(int tag, int ask) throws IOException {
+        this.writeLock.lock();
+        try{
+            this.out.writeInt(tag);
+            this.out.writeInt(ask);
+            this.out.flush();
+        }
+        finally {
+            this.writeLock.unlock();
+        }
+    }
 
     public void send(int tag, int ask, boolean bool, byte[] b) throws IOException {
         this.writeLock.lock();
@@ -222,7 +233,6 @@ public class TaggedConnection implements AutoCloseable {
                     return new Frame(tag, ask, Quest.deserialize(in));
                 }
                 case 3 -> {
-                    in.readUTF();
                     return new Frame(tag, ask, null);
                 }
                 default -> {

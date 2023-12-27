@@ -62,7 +62,7 @@ public class ClientController {
             else if (i == 2){
                 Thread thread = new Thread (() -> {
                     try {
-                        m.send(3, ask, "");
+                        m.send(3, ask);
                         Frame frame = m.receive(3);
                         if (frame.tag == 3) {
                             System.out.println("quest number: "+ frame.ask +" content:" + frame.obj);
