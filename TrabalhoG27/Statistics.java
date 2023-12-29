@@ -34,12 +34,12 @@ public class Statistics {
         try {
             this.lock.lock();
             activeTasks ++;
-            Condition cond = lock.newCondition();
-            if (this.availableMemory < memory)
+            if (this.availableMemory < memory) {
+                Condition cond = lock.newCondition();
                 conds.add(cond);
-
-            while (this.availableMemory<memory)
-                cond.await();
+                while (this.availableMemory<memory)
+                    cond.await();
+            }
 
             this.availableMemory-= memory;
 
