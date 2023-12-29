@@ -19,12 +19,21 @@ public class Statistics {
     }
 
     public int getAvailableMemory() {
-        return availableMemory;
+        this.lock.lock();
+        try {
+            return availableMemory;
+        }finally{
+            this.lock.unlock();
+        }
     }
 
     public int getActiveTasks() {
-        return activeTasks;
-
+        this.lock.lock();
+        try{
+            return activeTasks;
+        }finally {
+            this.lock.unlock();
+        }
     }
 
     /**Função responsavel por atualizar as estatisticas antes de uma task começar
