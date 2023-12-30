@@ -10,7 +10,7 @@ public class Server {
     private static final Accounts accounts = new Accounts();
     private static final ReentrantLock lock = new ReentrantLock();
 
-    private static final Statistics stats = new Statistics(5000);
+    private static final Statistics stats = new Statistics(10000);
 
     private static final WorkTeam wt = new WorkTeam();
 
