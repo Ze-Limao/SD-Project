@@ -10,7 +10,7 @@ public class Worker {
         TaggedConnection c = new TaggedConnection(s);
         try {
             //connect worker
-            c.send(254,5000);
+            c.send(254,5000);//<--
             System.out.println("asked for connection");
             while (true) {
                 String q = c.receiveQuest();
