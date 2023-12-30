@@ -2,6 +2,7 @@ package SD.TrabalhoG27;
 
 
 import java.io.IOException;
+import java.util.Random;
 
 public class ClientController {
     private final Demultiplexer m;
@@ -42,7 +43,9 @@ public class ClientController {
             ask += 1;
             //ask quest
             if (i == 1) {
-                Quest quest = new Quest(1000, Menu.askQuest());
+                Random r = new Random();
+                int memoryNeeded = r.nextInt(5000) + 1;
+                Quest quest = new Quest(memoryNeeded, Menu.askQuest());
                 Thread thread = new Thread (() -> {
                     try {
                         m.send(2, ask, quest);

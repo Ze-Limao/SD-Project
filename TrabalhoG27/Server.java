@@ -3,12 +3,15 @@ package SD.TrabalhoG27;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 
 public class Server {
     private static final Accounts accounts = new Accounts();
     private static final ReentrantLock lock = new ReentrantLock();
+    private static final Condition cond = lock.newCondition();
+
 
     private static final Statistics stats = new Statistics(10000);
 
@@ -98,11 +101,11 @@ public class Server {
                         } else {
                             frame = null;
                             System.out.println("worker ativo");
-                            Thread.sleep(2000000);
+                            lock.lock();
+                            cond.await();
+                            lock.unlock();
                         }
-
                         isWorker = serverSwitcher(frame, c);
-
                     }
                 } catch (Exception ignored) { }
             };
