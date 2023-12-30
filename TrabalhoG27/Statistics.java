@@ -31,6 +31,13 @@ public class Statistics {
 
     }
 
+    public void updateMemory(boolean b, int memory){
+        if (b)
+            this.availableMemory+=memory;
+        else
+            this.availableMemory-=memory;
+    }
+
     public int getAvailableMemory() {
         this.lock.lock();
         try {

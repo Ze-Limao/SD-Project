@@ -13,7 +13,7 @@ public class Server {
     private static final Condition cond = lock.newCondition();
 
 
-    private static final Statistics stats = new Statistics(10000);
+    private static final Statistics stats = new Statistics(2000);
 
     private static final WorkTeam wt = new WorkTeam();
 
@@ -24,11 +24,13 @@ public class Server {
         switch(frame.tag){
             case 254 -> { // adicionar worker
                 //adicionar o worker à lista de workers
+                stats.updateMemory(true, frame.ask);
                 wt.setNewWorker(c);
                 System.out.println("worker adicionado");
                 return true;
             }
             case 253 -> { // remover worker
+                stats.updateMemory(false, frame.ask);
                 wt.removeWorker(c);
                 System.out.println("worker removido");
             }

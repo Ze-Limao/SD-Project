@@ -218,13 +218,12 @@ public class TaggedConnection implements AutoCloseable {
         try {
             int tag = in.readInt();
 
-            if (tag == 253 || tag == 254) {
-
-                return new Frame(tag, 0, null);
-            }
             int ask = in.readInt();
 
             switch (tag) {
+                case 254,253 -> {
+                    return new Frame(tag,ask,null);
+                }
                 case 1, 0 -> {
                     Account acc = Account.deserialize(in);
                     return new Frame(tag, ask, acc);
