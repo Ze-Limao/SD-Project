@@ -56,7 +56,9 @@ public class Statistics {
         try {
             this.lock.lock();
             activeTasks ++;
-            if (this.availableMemory < memory) {
+
+
+            if (!conds.isEmpty()|| this.availableMemory < memory) {
                 Condition cond = lock.newCondition();
                 TaskMemory tm = new TaskMemory(cond, memory);
                 conds.add(tm);
@@ -66,6 +68,7 @@ public class Statistics {
                 }
             }
             this.availableMemory-= memory;
+
 
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
