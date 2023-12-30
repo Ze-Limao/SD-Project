@@ -32,10 +32,16 @@ public class Statistics {
     }
 
     public void updateMemory(boolean b, int memory){
-        if (b)
-            this.availableMemory+=memory;
-        else
-            this.availableMemory-=memory;
+        this.lock.lock();
+        try {
+            if (b)
+                this.availableMemory+=memory;
+            else
+                this.availableMemory-=memory;
+            System.out.println("memory updated: " + memory + "total memory: "+ this.availableMemory);
+        }finally{
+            this.lock.unlock();
+        }
     }
 
     public int getAvailableMemory() {
