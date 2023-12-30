@@ -221,7 +221,7 @@ public class TaggedConnection implements AutoCloseable {
             int ask = in.readInt();
 
             switch (tag) {
-                case 254,253 -> {
+                case 254, 253, 3 -> {
                     return new Frame(tag,ask,null);
                 }
                 case 1, 0 -> {
@@ -230,9 +230,6 @@ public class TaggedConnection implements AutoCloseable {
                 }
                 case 2 -> {
                     return new Frame(tag, ask, Quest.deserialize(in));
-                }
-                case 3 -> {
-                    return new Frame(tag, ask, null);
                 }
                 default -> {
                     System.out.println("not implemented yet 2 //" + tag + "//");

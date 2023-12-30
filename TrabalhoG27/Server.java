@@ -13,7 +13,7 @@ public class Server {
     private static final Condition cond = lock.newCondition();
 
 
-    private static final Statistics stats = new Statistics(2000);
+    private static final Statistics stats = new Statistics(0);
 
     private static final WorkTeam wt = new WorkTeam();
 
@@ -25,13 +25,13 @@ public class Server {
             case 254 -> { // adicionar worker
                 //adicionar o worker à lista de workers
                 stats.updateMemory(true, frame.ask);
-                wt.setNewWorker(c);
+                wt.setNewWorker(c,frame.ask);
                 System.out.println("worker adicionado");
                 return true;
             }
             case 253 -> { // remover worker
                 stats.updateMemory(false, frame.ask);
-                wt.removeWorker(c);
+                wt.removeWorker(c,frame.ask);
                 System.out.println("worker removido");
             }
             case 0 -> {
@@ -50,17 +50,17 @@ public class Server {
                 Runnable response = () -> {
                     stats.newTask(q.getMemory());
                     //atribui a um worker disponivel o pedido
-                    TaggedConnection worker;
+                    WorkerInfo worker;
                     try {
-                        worker = wt.getWorker();
+                        worker = wt.getWorker(q.getMemory());
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                     try {
-                        worker.send(q.getCode());
+                        worker.c.send(q.getCode());
 
                         //recebe do worker o resultado
-                        String result = worker.receiveResult();
+                        String result = worker.c.receiveResult();
 
                         //liberta o worker
                         wt.makeAvailable(worker);

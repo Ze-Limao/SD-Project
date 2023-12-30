@@ -9,7 +9,7 @@ public class Statistics {
     private int availableMemory;
     private int activeTasks;
 
-    private class TaskMemory {
+    private static class TaskMemory {
         public Condition cond;
         public int memory;
         public int i;
@@ -39,6 +39,31 @@ public class Statistics {
             else
                 this.availableMemory-=memory;
             System.out.println("memory updated: " + memory + "total memory: "+ this.availableMemory);
+
+            int memoriaDisponivel= this.availableMemory;
+            int vistos = 0;
+            while (!conds.isEmpty() && vistos < conds.size()  && memoriaDisponivel > 0) {
+                TaskMemory tm = conds.peek();
+                //verificar se terá memória soficiente
+                if (memoriaDisponivel < tm.memory) {
+                    //se não tem: verifica se i < 5
+                    if (tm.i < 5) {
+                        // verifica-se:passa para o fim da fila e incrementa o i
+                        tm.i++;
+                        conds.add(conds.poll());
+                        vistos++;
+                    } else {
+                        // nao se verifica: não sinaliza e espera até ter
+                        break;
+                    }
+                }
+                //se tem: incrementa memória a ser indisponbilizada, sinaliza, e verifica se a próxima tm pode ser sinalizada ou não
+                else {
+                    memoriaDisponivel -= tm.memory;
+                    conds.poll().cond.signal();
+                }
+            }
+
         }finally{
             this.lock.unlock();
         }
