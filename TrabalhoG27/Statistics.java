@@ -9,8 +9,21 @@ public class Statistics {
     private int availableMemory;
     private int activeTasks;
 
+    private class TaskMemory {
+        public Condition cond;
+        public int memory;
+        public int i;
+
+        public TaskMemory(Condition cond, int memory){
+            this.cond = cond;
+            this.memory = memory;
+            this.i = 0;
+
+        }
+    }
+
     private final ReentrantLock lock = new ReentrantLock();
-    private final Queue<Condition> conds = new ArrayDeque<>();
+    private final Queue<TaskMemory> conds = new ArrayDeque<>();
 
     public Statistics(int memory) {
         this.availableMemory = memory;
@@ -45,11 +58,13 @@ public class Statistics {
             activeTasks ++;
             if (this.availableMemory < memory) {
                 Condition cond = lock.newCondition();
-                conds.add(cond);
-                while (this.availableMemory<memory)
+                TaskMemory tm = new TaskMemory(cond, memory);
+                conds.add(tm);
+                while (this.availableMemory < memory){
                     cond.await();
+                    tm.i++;
+                }
             }
-
             this.availableMemory-= memory;
 
         } catch (InterruptedException e) {
@@ -65,9 +80,29 @@ public class Statistics {
             this.lock.lock();
             activeTasks -= 1;
             this.availableMemory += memory;
-
-            if (!conds.isEmpty()) {
-                conds.poll().signal();
+            int memoriaDisponivel= this.availableMemory;
+            int vistos = 0;
+            while (!conds.isEmpty() && vistos < conds.size()  && memoriaDisponivel > 0){
+                TaskMemory tm =conds.peek();
+                //verificar se terá memória soficiente
+                if (memoriaDisponivel < tm.memory){
+                    //se não tem: verifica se i < 5
+                    if (tm.i < 5){
+                        // verifica-se:passa para o fim da fila e incrementa o i
+                        tm.i++;
+                        conds.add(conds.poll());
+                        vistos++;
+                    }
+                    else{
+                        // nao se verifica: não sinaliza e espera até ter
+                        break;
+                    }
+                }
+                //se tem: incrementa memória a ser indisponbilizada, sinaliza, e verifica se a próxima tm pode ser sinalizada ou não
+                else{
+                    memoriaDisponivel -= tm.memory;
+                    conds.poll().cond.signal();
+                }
             }
         }finally{
             this.lock.unlock();
